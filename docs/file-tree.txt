@@ -67,6 +67,7 @@ postcss.config.mjs
 proxy.ts
 public/favicon.svg
 scripts/prepare-sites.mjs
+scripts/release-security.mjs
 tests/bazi.test.ts
 tests/calendar.test.ts
 tests/e2e/core.spec.ts
@@ -79,6 +80,7 @@ tests/helpers.ts
 tests/iching.test.ts
 tests/interpretation.test.ts
 tests/production.test.ts
+tests/release-security.test.ts
 tests/storage.test.ts
 tests/ziwei.test.ts
 tsconfig.json

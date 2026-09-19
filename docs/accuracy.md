@@ -35,7 +35,7 @@
 | 紫微主要輔煞星與祿存           | Implemented / Needs verification                | 由 iztro 計算並經 registry 顯示；各顆未全部獨立回歸驗證                                       |
 | 紫微四化                       | Implemented / Tested / Needs verification       | 癸年四化具體案例；其餘九干有套件表，尚待獨立逐干驗證                                          |
 | 紫微大限/流年                  | Implemented / Tested / Needs verification       | 本命/大限/流年分層資料；上游 2000/2023 案例；全範圍 Needs verification                        |
-| AI                             | Implemented / Mock-tested                       | 真實 OpenAI 呼叫未驗收：未提供金鑰；提示詞與結構限制不保證敘述零幻覺                          |
+| AI                             | Implemented / Mock + live smoke-tested                       | DeepSeek 三種合成命盤實際呼叫已通過 schema 與引用驗證；提示詞與結構限制不保證敘述零幻覺                          |
 | 保存/刪除/回看/備份            | Implemented / Tested                            | localStorage schema v1，最多 200 筆；無雲端同步；具驗證與確認的備份匯入                                   |
 
 ## 曆法與紫微的一致性

@@ -20,19 +20,19 @@ npm run dev
 
 開啟 App → 出生資料 → 我的命盤 → 八字／紫微／流年。易經不需要出生資料。所有命盤與歷史預設只在裝置保存。點擊「保存紀錄」才新增歷史；設定頁可以匯出、驗證並還原含個資的 JSON 備份。
 
-## OpenAI 設定
+## DeepSeek 設定
 
 在 `.env.local` 或部署主機 secret manager 設定，**不要把真實值提交到 Git 或傳入瀏覽器**：
 
 ```dotenv
-OPENAI_API_KEY=你的伺服器金鑰
-OPENAI_MODEL=gpt-5-mini
+DEEPSEEK_API_KEY=你的伺服器金鑰
+DEEPSEEK_MODEL=deepseek-flash
 APP_ORIGIN=http://127.0.0.1:3000
 AI_ACCESS_TOKEN=至少24字元的強隨機App存取碼
 ```
 
-1. OPENAI_API_KEY 從自己的 OpenAI 開發者帳戶建立；需有模型存取權與配額。
-2. OPENAI_MODEL 可選帳戶可用且支援 structured outputs 的模型。此交付尚未使用真實金鑰呼叫服務。
+1. DEEPSEEK_API_KEY 從自己的 DeepSeek 開發者帳戶建立；需有模型存取權與配額。
+2. DEEPSEEK_MODEL 可選帳戶可用且支援 structured outputs 的模型。此交付尚未使用真實金鑰呼叫服務。
 3. production 必須設定 AI_ACCESS_TOKEN，UI `/settings` 輸入的是 **App 存取碼**，絕不是 API key。取得一小時 HttpOnly cookie。
 4. 重新啟動主機。沒有 API key 時會顯示明確錯誤，排盤與保存照常可用。
 5. AI 只收到去識別化後的計算 facts 與问题。自由輸入的問題請勿包含敏感個資。
@@ -64,7 +64,7 @@ npm run test:e2e
 - `lib/bazi`：四柱、藏干、十神、納音、五行表層統計、起運/大運、有限流年關係。
 - `lib/ziwei` + `data/stars.ts`：獨立 iztro adapter、十二宮、星曜 registry、四化、大限/流年。
 - `lib/interpretation`：輸入 allowlist、facts、系統提示詞與輸出 schema，與 engine 完全分離。
-- `app/api/interpret`：server-only OpenAI Responses API；`app/api/access`：正式 AI 存取。
+- `app/api/interpret`：server-only DeepSeek Responses API；`app/api/access`：正式 AI 存取。
 - `lib/storage` + `lib/history`：schema v1，CRUD 入口可在未來替換為 DB repository；目前無後端出生資料保存。
 - `components`：純顯示/互動與 dynamic engine 載入；核心公式不在 React 中。
 
@@ -90,3 +90,11 @@ npm run test:e2e
 ## 完整原始碼目錄
 
 見 [file-tree.txt](docs/file-tree.txt)，排除 node_modules、.next、work、測試暫存與輸出 ZIP。這些都不是交付的應用原始碼。
+
+## DeepSeek 供應商切換
+
+API 固定使用 `https://api.deepseek.com`，預設 `deepseek-flash`，採 Responses API JSON Schema，關閉 thinking 以控制解讀延遲。伺服器仍以 Zod 與 fact IDs 驗證輸出，未完成或不合法的回應不保存。SDK 套件仍使用相容的 `openai`，實際請求只傳 DeepSeek。
+
+可把 DeepSeek 金鑰放在已忽略的 `.env`，既有 `.env.local` 的 OpenAI 金鑰不會被使用。正式主機必須另外設定 `DEEPSEEK_API_KEY` secret；本機 env 檔案不會隨 Git 或部署封裝上傳。
+
+官方相容性說明：https://api-docs.deepseek.com/guides/responses_api/ 。實際連線驗收需有效金鑰及帳戶額度。

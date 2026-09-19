@@ -30,7 +30,7 @@ export function AIAccess() {
     <form className="panel form-panel settings-form" onSubmit={submit}>
       <h2>AI 存取</h2>
       <p className="small muted">
-        正式部署時，輸入管理者提供的 App 存取碼。這不是 OpenAI API
+        正式部署時，輸入管理者提供的 App 存取碼。這不是 DeepSeek API
         key；請勿在此填寫 API key。
       </p>
       <label>

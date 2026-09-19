@@ -4,9 +4,9 @@
   "lint": "passed, zero warnings",
   "typescript": "passed",
   "vitest": {
-    "passed": 179,
+    "passed": 182,
     "failed": 0,
-    "files": 7
+    "files": 8
   },
   "playwright": {
     "passed": 8,
@@ -18,7 +18,7 @@
   "npm_audit": {
     "vulnerabilities": 0
   },
-  "live_openai": "not run; no real API key supplied",
+  "live_openai": "Retired provider; earlier trial blocked by credit_balance_exhausted",
   "independent_full_ziwei_verification": "10 birthdays investigated with cdestiny; full charts disagree; unresolved, not certified",
   "durable_limit_integration": {
     "access_attempt_statuses": [
@@ -29,5 +29,17 @@
       401,
       429
     ]
+  },
+  "live_deepseek": {
+    "model": "deepseek-flash",
+    "synthetic_cases_passed": [
+      "iching",
+      "bazi",
+      "ziwei"
+    ],
+    "schema_and_fact_references": "passed",
+    "chart_unchanged": true,
+    "initial_rejected_response": 1,
+    "semantic_accuracy": "sample review only; not a guarantee"
   }
 }

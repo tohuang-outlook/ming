@@ -94,7 +94,7 @@ export function ChartActions({
       <h2>AI 詳細解讀</h2>
       <p className="small muted">
         只傳送解讀所需的命盤結構與你的問題至
-        OpenAI，不傳送稱呼、出生地或原始出生日期。請勿在問題中填入敏感個資。AI
+        DeepSeek，不傳送稱呼、出生地或原始出生日期。請勿在問題中填入敏感個資。AI
         解讀可能有誤，請對照原始命盤。
       </p>
       <div className="actions">

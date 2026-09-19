@@ -10,19 +10,22 @@ import {
   makeSession,
   rateLimit,
 } from "@/lib/server/security";
-const { parse } = vi.hoisted(() => ({ parse: vi.fn() }));
+const { parse, constructed } = vi.hoisted(() => ({ parse: vi.fn(), constructed: vi.fn() }));
 vi.mock("openai", () => ({
   default: class {
     responses = { parse };
+    constructor(options: unknown) { constructed(options); }
   },
 }));
 beforeEach(() => {
   resetLimits();
   vi.stubEnv("NODE_ENV", "test");
   vi.stubEnv("APP_ORIGIN", "http://127.0.0.1:3000");
-  vi.stubEnv("OPENAI_API_KEY", "");
+  vi.stubEnv("DEEPSEEK_API_KEY", "");
   vi.stubEnv("AI_ACCESS_TOKEN", "");
   parse.mockReset();
+  constructed.mockReset();
+  vi.stubEnv("DEEPSEEK_MODEL", "deepseek-flash");
 });
 afterEach(() => vi.unstubAllEnvs());
 function request(body: unknown, origin = "http://127.0.0.1:3000") {
@@ -66,7 +69,7 @@ it("invalid chart returns 400 before model call", async () => {
 it("missing key returns informative 503", async () => {
   const r = await POST(request(prepareInterpretation(chart)));
   expect(r.status).toBe(503);
-  expect(await r.text()).toContain("OPENAI_API_KEY");
+  expect(await r.text()).toContain("DEEPSEEK_API_KEY");
 });
 it("cross origin denied", async () =>
   expect(
@@ -93,7 +96,7 @@ it("JSON malformed returns 400", async () =>
     ).status,
   ).toBe(400));
 it("model receives facts only, success cannot replace chart", async () => {
-  vi.stubEnv("OPENAI_API_KEY", "test");
+  vi.stubEnv("DEEPSEEK_API_KEY", "test");
   const answer = {
     summary: "參考解讀",
     sections: [
@@ -101,17 +104,21 @@ it("model receives facts only, success cannot replace chart", async () => {
     ],
     limitations: ["僅供參考"],
   };
-  parse.mockResolvedValue({ output_parsed: answer });
+  parse.mockResolvedValue({ status: "completed", output_parsed: answer });
   const before = JSON.stringify(chart);
   const r = await POST(request(prepareInterpretation(chart)));
   expect(r.status).toBe(200);
   expect(await r.json()).toHaveProperty("interpretation", answer);
-  expect(parse.mock.calls[0][0].store).toBe(false);
+  expect(constructed).toHaveBeenCalledWith(expect.objectContaining({ baseURL: "https://api.deepseek.com", apiKey: "test", maxRetries: 0 }));
+  expect(parse.mock.calls[0][0].model).toBe("deepseek-flash");
+  expect(parse.mock.calls[0][0].reasoning).toEqual({ effort: "none" });
+  expect(parse.mock.calls[0][0].text.format.type).toBe("json_schema");
   expect(JSON.stringify(chart)).toBe(before);
 });
 it("unknown fact reference rejected", async () => {
-  vi.stubEnv("OPENAI_API_KEY", "test");
+  vi.stubEnv("DEEPSEEK_API_KEY", "test");
   parse.mockResolvedValue({
+    status: "completed",
     output_parsed: {
       summary: "x",
       sections: [{ title: "x", text: "x", factIds: ["invented"] }],
@@ -121,7 +128,7 @@ it("unknown fact reference rejected", async () => {
   expect((await POST(request(prepareInterpretation(chart)))).status).toBe(502);
 });
 it("provider errors sanitized", async () => {
-  vi.stubEnv("OPENAI_API_KEY", "test-secret");
+  vi.stubEnv("DEEPSEEK_API_KEY", "test-secret");
   parse.mockRejectedValue(new Error("test-secret provider trace"));
   const r = await POST(request(prepareInterpretation(chart)));
   expect(r.status).toBe(502);
@@ -146,4 +153,15 @@ it("limiter resets at next window", () => {
   rateLimit("test", 1, 0);
   expect(() => rateLimit("test", 1, 100)).toThrow();
   expect(() => rateLimit("test", 1, 60000)).not.toThrow();
+});
+
+it("OpenAI credentials are never reused for DeepSeek", async () => {
+  vi.stubEnv("OPENAI_API_KEY", "unrelated-openai-key");
+  expect((await POST(request(prepareInterpretation(chart)))).status).toBe(503);
+  expect(constructed).not.toHaveBeenCalled();
+});
+it("truncated provider output is rejected even with parseable JSON", async () => {
+  vi.stubEnv("DEEPSEEK_API_KEY", "test");
+  parse.mockResolvedValue({ status: "incomplete", output_parsed: { summary: "x", sections: [{title: "x", text: "x", factIds:["iching.original"]}], limitations: [] } });
+  expect((await POST(request(prepareInterpretation(chart)))).status).toBe(502);
 });
