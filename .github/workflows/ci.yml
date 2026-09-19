@@ -1,0 +1,39 @@
+name: Production checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm audit --audit-level=moderate
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build:sites
+      - run: npx playwright install --with-deps chromium
+      - name: Test production artifact
+        run: |
+          printf 'APP_ORIGIN=http://127.0.0.1:8787\n' > .dev.vars
+          npm run db:migrate:local
+          npx wrangler dev dist/server/index.js --assets dist/client --port 8787 --log-level error > worker.log 2>&1 &
+          worker_pid=$!
+          trap 'kill "$worker_pid"' EXIT
+          for attempt in $(seq 1 30); do
+            curl --fail --silent http://127.0.0.1:8787/api/health && break
+            sleep 1
+          done
+          PLAYWRIGHT_PRODUCTION=1 PLAYWRIGHT_BASE_URL=http://127.0.0.1:8787 npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: diagnostic-results
+          path: |
+            test-results
+            worker.log

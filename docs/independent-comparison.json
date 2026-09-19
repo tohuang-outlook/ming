@@ -1,0 +1,148 @@
+[
+  {
+    "date": "1990-01-15",
+    "soulMatch": true,
+    "bodyMatch": true,
+    "differences": [
+      "紫微: reference=未, app=辰",
+      "破軍: reference=未, app=戌",
+      "天機: reference=午, app=卯",
+      "左輔: reference=巳, app=卯",
+      "太陽: reference=辰, app=丑",
+      "武曲: reference=卯, app=子",
+      "七殺: reference=卯, app=午",
+      "天同: reference=寅, app=亥",
+      "天梁: reference=寅, app=巳",
+      "天相: reference=丑, app=辰",
+      "巨門: reference=子, app=卯",
+      "廉貞: reference=亥, app=申",
+      "貪狼: reference=亥, app=寅",
+      "太陰: reference=戌, app=丑",
+      "天府: reference=酉, app=子",
+      "右弼: reference=酉, app=亥"
+    ]
+  },
+  {
+    "date": "2000-08-16",
+    "soulMatch": true,
+    "bodyMatch": true,
+    "differences": [
+      "破軍: reference=午, app=申",
+      "太陽: reference=巳, app=卯",
+      "武曲: reference=辰, app=寅",
+      "天同: reference=卯, app=丑",
+      "七殺: reference=寅, app=辰",
+      "右弼: reference=寅, app=辰",
+      "天梁: reference=丑, app=卯",
+      "廉貞: reference=子, app=戌",
+      "天相: reference=子, app=寅",
+      "左輔: reference=子, app=戌",
+      "巨門: reference=亥, app=丑",
+      "貪狼: reference=戌, app=子",
+      "太陰: reference=酉, app=亥",
+      "紫微: reference=申, app=午",
+      "天府: reference=申, app=戌",
+      "天機: reference=未, app=巳"
+    ]
+  },
+  {
+    "date": "1985-06-12",
+    "soulMatch": true,
+    "bodyMatch": true,
+    "differences": [
+      "紫微: reference=子, app=巳",
+      "天機: reference=亥, app=辰",
+      "七殺: reference=戌, app=巳",
+      "太陽: reference=酉, app=寅",
+      "天梁: reference=酉, app=辰",
+      "左輔: reference=酉, app=未",
+      "武曲: reference=申, app=丑",
+      "天相: reference=申, app=卯",
+      "天同: reference=未, app=子",
+      "巨門: reference=未, app=寅",
+      "貪狼: reference=午, app=丑",
+      "太陰: reference=巳, app=子",
+      "右弼: reference=巳, app=未",
+      "廉貞: reference=辰, app=酉",
+      "天府: reference=辰, app=亥",
+      "破軍: reference=寅, app=酉"
+    ]
+  },
+  {
+    "date": "1978-11-03",
+    "soulMatch": true,
+    "bodyMatch": true,
+    "differences": [
+      "左輔: reference=卯, app=丑",
+      "右弼: reference=亥, app=丑"
+    ]
+  },
+  {
+    "date": "1960-04-08",
+    "soulMatch": true,
+    "bodyMatch": true,
+    "differences": [
+      "左輔: reference=申, app=午",
+      "右弼: reference=午, app=申"
+    ]
+  },
+  {
+    "date": "1995-09-20",
+    "soulMatch": true,
+    "bodyMatch": true,
+    "differences": [
+      "左輔: reference=丑, app=亥",
+      "右弼: reference=丑, app=卯"
+    ]
+  },
+  {
+    "date": "2005-12-23",
+    "soulMatch": true,
+    "bodyMatch": true,
+    "differences": [
+      "左輔: reference=辰, app=寅",
+      "右弼: reference=戌, app=子"
+    ]
+  },
+  {
+    "date": "2012-03-01",
+    "soulMatch": true,
+    "bodyMatch": true,
+    "differences": [
+      "左輔: reference=未, app=巳",
+      "右弼: reference=未, app=酉",
+      "紫微: reference=巳, app=寅",
+      "七殺: reference=巳, app=申",
+      "天機: reference=辰, app=丑",
+      "天梁: reference=辰, app=未",
+      "天相: reference=卯, app=午",
+      "太陽: reference=寅, app=亥",
+      "巨門: reference=寅, app=巳",
+      "武曲: reference=丑, app=戌",
+      "貪狼: reference=丑, app=辰",
+      "天同: reference=子, app=酉",
+      "太陰: reference=子, app=卯",
+      "天府: reference=亥, app=寅",
+      "廉貞: reference=酉, app=午",
+      "破軍: reference=酉, app=子"
+    ]
+  },
+  {
+    "date": "1949-10-01",
+    "soulMatch": true,
+    "bodyMatch": true,
+    "differences": [
+      "左輔: reference=丑, app=亥",
+      "右弼: reference=丑, app=卯"
+    ]
+  },
+  {
+    "date": "2024-06-10",
+    "soulMatch": true,
+    "bodyMatch": true,
+    "differences": [
+      "右弼: reference=辰, app=午",
+      "左輔: reference=戌, app=申"
+    ]
+  }
+]

@@ -1,0 +1,33 @@
+{
+  "date": "2026-09-19",
+  "npm_install": "passed",
+  "lint": "passed, zero warnings",
+  "typescript": "passed",
+  "vitest": {
+    "passed": 179,
+    "failed": 0,
+    "files": 7
+  },
+  "playwright": {
+    "passed": 8,
+    "failed": 0,
+    "browser": "Chromium desktop and 390px mobile emulation; not iOS Safari",
+    "runtime": "Portable production Worker on workerd, migrated D1"
+  },
+  "production_build": "Next.js 16.3.5 webpack + OpenNext 1.20.6 + Wrangler 4.135.0 portable Worker",
+  "npm_audit": {
+    "vulnerabilities": 0
+  },
+  "live_openai": "not run; no real API key supplied",
+  "independent_full_ziwei_verification": "10 birthdays investigated with cdestiny; full charts disagree; unresolved, not certified",
+  "durable_limit_integration": {
+    "access_attempt_statuses": [
+      401,
+      401,
+      401,
+      401,
+      401,
+      429
+    ]
+  }
+}

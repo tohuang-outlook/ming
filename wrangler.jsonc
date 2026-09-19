@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "zhonghua-mingli-ai",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-09-19",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "d1_databases": [{ "binding": "DB", "database_name": "mingli-limits-local", "database_id": "local", "migrations_dir": "drizzle" }]
+}
