@@ -1,4 +1,5 @@
 "use client";
+import { ProfileSwitcher } from "./profile-switcher";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -71,6 +72,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             傳統智慧 <span className="divider">/</span> 當代探索
           </span>
           <div className="top-actions">
+            <ProfileSwitcher />
             <Link href="/settings" className="settings-link" aria-label="設定">
               <Settings size={18} />
             </Link>

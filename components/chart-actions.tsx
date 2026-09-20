@@ -27,7 +27,7 @@ export function ChartActions({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const key = JSON.stringify([chart, question, annualBazi]);
+  const key = JSON.stringify([chart, question, annualBazi, existing?.id ?? store.activeProfileId]);
   const [result, setResult] = useState<{
     key: string;
     data: z.infer<typeof InterpretationSchema>;
@@ -80,8 +80,8 @@ export function ChartActions({
         createdAt,
         question,
         birthProfileId:
-          existing?.birthProfileId ??
-          (chart.system === "iching" ? null : (store.profile?.id ?? null)),
+          existing ? existing.birthProfileId : (chart.system === "iching" ? null : (store.profile?.id ?? null)),
+        birthProfileName: existing ? existing.birthProfileName : (chart.system === "iching" ? undefined : store.profile?.name?.trim() || "未命名人物"),
         chart,
         annualBazi,
         interpretation,

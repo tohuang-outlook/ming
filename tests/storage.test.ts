@@ -18,15 +18,15 @@ it("empty versioned store", () =>
   expect(readStore(memory())).toEqual(EMPTY_STORE));
 it("birth profile persists without loss", () => {
   const s = memory();
-  writeStore(s, { ...EMPTY_STORE, profile: profile() });
-  expect(readStore(s).profile).toEqual(profile());
+  writeStore(s, { ...EMPTY_STORE, profiles: [profile()], activeProfileId: "test" });
+  expect(readStore(s).profiles[0]).toEqual(profile());
 });
 it("corrupted/future data is not silently overwritten", () => {
   const s = memory();
   s.setItem(STORAGE_KEY, "broken");
   expect(() => readStore(s)).toThrow();
   expect(s.getItem(STORAGE_KEY)).toBe("broken");
-  s.setItem(STORAGE_KEY, JSON.stringify({ ...EMPTY_STORE, version: 2 }));
+  s.setItem(STORAGE_KEY, JSON.stringify({ ...EMPTY_STORE, version: 99 }));
   expect(() => readStore(s)).toThrow();
 });
 it("storage denial propagated", () =>

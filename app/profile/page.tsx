@@ -3,17 +3,44 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/components/store";
 import { PageTitle, ErrorNotice } from "@/components/ui";
-import { saveProfile } from "@/lib/storage";
-import { BirthProfileSchema } from "@/types";
+import { saveProfile, switchProfile, deleteProfile, profileLabel, MAX_PROFILES } from "@/lib/storage";
+import { BirthProfileSchema, type BirthProfile } from "@/types";
 export default function ProfilePage() {
   const { store } = useStore();
+  return <ProfileWorkspace key={store.activeProfileId ?? "empty"} />;
+}
+function ProfileWorkspace() {
+  const { store, error: readError } = useStore();
+  const [adding, setAdding] = useState(false);
+  const [confirm, setConfirm] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  return <>
+    <PageTitle eyebrow="PEOPLE & PROFILES" title="人物資料庫" description="為家人與朋友分別保存出生資料，隨時切換命盤。" />
+    <section className="panel">
+      <div className="section-heading"><h2>已保存人物（{store.profiles.length} / {MAX_PROFILES}）</h2>
+      <button className="button primary" disabled={store.profiles.length >= MAX_PROFILES} onClick={() => { setAdding(true); setConfirm(null); }}>新增人物</button></div>
+      <ErrorNotice message={error || readError} />
+      <p className="small muted">切換人物會更新八字、紫微與流年。歷史紀錄保留原始命盤；編輯中的未儲存內容會在切換時放棄。</p>
+      {!store.profiles.length && <p>尚未建立人物，請填寫下方出生資料。</p>}
+      <div className="record-list">{store.profiles.map(person => <article className="record" key={person.id}>
+        <div><h3>{profileLabel(person)}</h3><p className="small muted">{person.calendarType === "Lunar" ? `農曆${person.isLeapMonth ? "（閏月）" : ""}` : "國曆"} · {person.timezone}{person.id === store.activeProfileId ? " · 目前人物" : ""}</p></div>
+        <div className="actions"><button className="button" aria-label={`編輯人物 ${profileLabel(person)}`} onClick={() => { try { switchProfile(person.id); setAdding(false); setConfirm(null); setError(""); } catch (e) { setError(e instanceof Error ? e.message : "切換失敗。"); } }}>切換／編輯</button>
+        <button className="button danger" aria-label={`刪除人物 ${profileLabel(person)}`} onClick={() => setConfirm(person.id)}>刪除人物</button></div>
+        {confirm === person.id && <div role="alert"><p>確定刪除「{person.name || "未命名人物"}」的出生資料？已保存的命盤歷史會保留。此人物資料無法復原。</p>
+          <div className="actions"><button className="button danger" onClick={() => { try { deleteProfile(person.id); setConfirm(null); setError(""); } catch (e) { setError(e instanceof Error ? e.message : "刪除失敗。"); } }}>確認刪除人物</button><button className="button" onClick={() => setConfirm(null)}>取消刪除</button></div></div>}
+      </article>)}</div>
+    </section>
+    {adding && store.profile && <button className="text-button" onClick={() => setAdding(false)}>取消新增，返回目前人物</button>}
+    <ProfileEditor key={adding ? "new" : store.profile?.id ?? "new"} p={adding ? null : store.profile} />
+  </>;
+}
+function ProfileEditor({ p }: { p: BirthProfile | null }) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [calendarChoice, setCalendar] = useState<"Gregorian" | "Lunar" | null>(
     null,
   );
-  const p = store.profile;
   const calendar = calendarChoice ?? p?.calendarType ?? "Gregorian";
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -47,8 +74,8 @@ export default function ProfilePage() {
     <>
       <PageTitle
         eyebrow="YOUR BIRTH PROFILE"
-        title="出生資料"
-        description="一次建立，八字與紫微斗數共同使用。"
+        title={p ? "編輯出生資料" : "新增出生資料"}
+        description={p ? "儲存會更新此人物資料，既有歷史命盤不會改寫。" : "建立新人物，八字與紫微斗數共同使用。"}
       />
       <div className="two-col">
         <form

@@ -55,6 +55,7 @@ export const HistoryRecordSchema = z
     createdAt: z.string().datetime(),
     question: z.string().max(1000),
     birthProfileId: z.string().nullable(),
+    birthProfileName: z.string().max(60).optional(),
     chart: FullChartSchema,
     annualBazi: AnnualBaziSchema.optional(),
     interpretation: InterpretationSchema.nullable(),

@@ -167,7 +167,7 @@ export default function SettingsPage() {
           }} />
         </label>
         {backup && <div className="notice" role="alert">
-          <p>備份已驗證：{backup.history.length} 筆紀錄，{backup.profile ? "含出生資料" : "無出生資料"}。還原會取代目前裝置的全部資料，建議先匯出目前備份。</p>
+          <p>備份已驗證：{backup.history.length} 筆紀錄，{backup.profiles.length} 位人物。還原會取代目前裝置的全部資料，建議先匯出目前備份。</p>
           <div className="actions">
             <button className="button danger" onClick={() => {
               try {

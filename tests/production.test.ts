@@ -26,7 +26,7 @@ it("production budget fails closed outside the configured runtime", async () => 
 it("backup version and size validated before any write", () => {
   expect(parseBackup(JSON.stringify(EMPTY_STORE))).toEqual(EMPTY_STORE);
   expect(() => parseBackup("broken")).toThrow("JSON");
-  expect(() => parseBackup(JSON.stringify({ ...EMPTY_STORE, version: 2 }))).toThrow("不相容");
+  expect(() => parseBackup(JSON.stringify({ ...EMPTY_STORE, version: 99 }))).toThrow("不相容");
   expect(() => parseBackup("x".repeat(8_000_001))).toThrow("8 MB");
 });
 it("sessions reject extra fields and malformed timestamps", () => {

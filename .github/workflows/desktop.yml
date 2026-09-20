@@ -36,6 +36,8 @@ jobs:
       - run: npm run build:desktop
       - name: Verify desktop flows
         run: npm run test:desktop
+      - name: Verify multi-person migration and switching
+        run: node scripts/test-profiles-desktop.mjs
       - name: Verify offline face observation with public-domain fixture
         run: |
           curl --fail --location --retry 2 --max-time 60 https://raw.githubusercontent.com/matplotlib/matplotlib/main/lib/matplotlib/mpl-data/sample_data/grace_hopper.jpg --output work/face-test.jpg
@@ -55,6 +57,7 @@ jobs:
             outputs/desktop-build/release-manifest.json
             outputs/desktop-validation.json
             outputs/face-desktop-validation.json
+            outputs/profiles-desktop-validation.json
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
@@ -63,3 +66,4 @@ jobs:
           path: |
             outputs/desktop-validation.json
             outputs/face-desktop-validation.json
+            outputs/profiles-desktop-validation.json

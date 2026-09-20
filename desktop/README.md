@@ -4,7 +4,7 @@ macOS Apple Silicon（M1 或更新），macOS 13 或更新。以 Electron 44 打
 
 ## 建置
 
-在 macOS arm64 執行 `npm ci`、`npm run package:desktop`。產物在 `outputs/desktop-build/`，應用程式版本 1.4.0。靜態畫面在獨立的 `work/desktop-source` 匯出，API routes 與網站 proxy 不會帶入桌面版。主程序與 preload 使用 esbuild 打包，發行檔案採明確白名單。建置會掃描本機已知秘密並拒絕包含它們的安裝內容。
+在 macOS arm64 執行 `npm ci`、`npm run package:desktop`。產物在 `outputs/desktop-build/`，應用程式版本 1.5.0。靜態畫面在獨立的 `work/desktop-source` 匯出，API routes 與網站 proxy 不會帶入桌面版。主程序與 preload 使用 esbuild 打包，發行檔案採明確白名單。建置會掃描本機已知秘密並拒絕包含它們的安裝內容。
 
 ## 安全邊界
 
@@ -65,3 +65,11 @@ npm run package:desktop:release
 1.3.1：無效歷史時間只停用該筆稱骨，不影響其餘命盤顯示。發行驗證增加完整 renderer 比對，並掛載 DMG 驗證內含 App 的簽章及封裝內容。
 
 1.4.0：称骨結果新增二兩一錢至七兩一錢全 51 首傳統歌訣，繁體中文、七言四句，離線查表。版本說明見 docs/chenggu.md。
+
+## 1.5.0 多人資料庫
+
+支援 100 位本機人物、頂端人物切換、新增／編輯／刪除與人物歷史篩選。全部人物共用 200 筆歷史上限。新歷史紀錄保存人物識別碼與當時稱呼；刪除人物不刪命盤，最後一位刪除後回到無人物狀態。易經維持不關聯人物。
+
+備份格式升至 version 2（profiles、activeProfileId），localStorage key 維持不變。讀取舊 v1 時純轉換、不先覆寫來源，下一次成功寫入才保存 v2。舊 v1 備份仍可匯入，v2 備份包含全部人物與當前選擇。舊版 App 不支援 v2；升級前請保存一份舊版備份，需降版時以該備份還原。備份仍限制 8 MB，API 金鑰獨立加密保存。
+
+`node scripts/test-profiles-desktop.mjs` 驗證舊資料遷移、兩人切換、編輯隔離、刪除確認、歷史保留、重啟持久性及完整備份還原。

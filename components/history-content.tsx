@@ -11,13 +11,20 @@ export function HistoryContent() {
   const { store, error: storageError } = useStore();
   const params = useSearchParams();
   const [filter, setFilter] = useState("all");
+  const [personFilter, setPersonFilter] = useState("all");
   const [selected, setSelected] = useState<string | null>(params.get("id"));
   const [confirm, setConfirm] = useState<string | null>(null);
   const [error, setError] = useState("");
   const current = store.history.find((r) => r.id === selected);
   const records = store.history.filter(
-    (r) => filter === "all" || r.type === filter,
+    (r) => (filter === "all" || r.type === filter) && (personFilter === "all" || (personFilter === "none" ? !r.birthProfileId : r.birthProfileId === personFilter)),
   );
+  function owner(record: typeof store.history[number]) {
+    if (!record.birthProfileId) return "未關聯人物";
+    const person = store.profiles.find(p => p.id === record.birthProfileId);
+    return record.birthProfileName || person?.name || (person ? "未命名人物" : "已刪除／舊版人物");
+  }
+  const people = [...new Set(store.history.map(r => r.birthProfileId).filter((id): id is string => !!id))];
   const labels = { bazi: "八字命理", ziwei: "紫微斗數", iching: "易經卜卦" };
   return (
     <>
@@ -37,6 +44,7 @@ export function HistoryContent() {
               {labels[current.type]} ·{" "}
               {formatDate(current.createdAt, store.settings.dateFormat)}
             </h2>
+            <p className="small muted">人物：{owner(current)}</p>
             <p>{current.question}</p>
             {current.chart.system === "iching" && (
               <p className="small muted">
@@ -68,6 +76,7 @@ export function HistoryContent() {
         </>
       ) : (
         <>
+          <label>篩選人物<select value={personFilter} onChange={e => setPersonFilter(e.target.value)}><option value="all">全部人物</option><option value="none">未關聯人物（易經等）</option>{people.map(id => <option key={id} value={id}>{owner(store.history.find(r => r.birthProfileId === id)!)}</option>)}</select></label>
           <div className="segmented" aria-label="紀錄類型">
             {[
               ["all", "全部"],
@@ -100,6 +109,7 @@ export function HistoryContent() {
                 <article className="panel record" key={r.id}>
                   <div>
                     <span className="eyebrow">{labels[r.type]}</span>
+                    <p className="small muted">人物：{owner(r)}</p>
                     <h3>{r.question || `${labels[r.type]}命盤`}</h3>
                     <p>
                       {formatDate(r.createdAt, store.settings.dateFormat)} ·{" "}

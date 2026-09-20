@@ -1,6 +1,7 @@
 "use client";
 import { useSyncExternalStore } from "react";
 import {
+  activeProfile,
   EMPTY_STORE,
   readStore,
   STORAGE_KEY,
@@ -33,5 +34,5 @@ function subscribe(cb: () => void) {
 }
 export function useStore() {
   const store = useSyncExternalStore(subscribe, snapshot, () => EMPTY_STORE);
-  return { store, error: problem };
+  return { store: { ...store, profile: activeProfile(store) }, error: problem };
 }

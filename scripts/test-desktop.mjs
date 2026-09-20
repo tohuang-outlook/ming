@@ -88,7 +88,7 @@ try {
   await app.evaluate(({ dialog }, filename) => { dialog.showSaveDialog = async () => ({ canceled: false, filePath: filename }); }, backup);
   await page.getByRole("button", { name: "匯出裝置備份", exact: true }).click();
   await expect(page.getByRole("status").filter({ hasText: "備份已匯出" })).toBeVisible();
-  const parsed = JSON.parse(await readFile(backup, "utf8")); expect(parsed.profile.birthDate).toBe("2000-08-16"); expect(parsed.history.length).toBeGreaterThan(0);
+  const parsed = JSON.parse(await readFile(backup, "utf8")); expect(parsed.profiles.find(p => p.id === parsed.activeProfileId).birthDate).toBe("2000-08-16"); expect(parsed.history.length).toBeGreaterThan(0);
   await page.getByLabel("從備份還原").setInputFiles(backup);
   await page.getByRole("button", { name: "確認取代並還原", exact: true }).click();
   await expect(page.getByRole("status").filter({ hasText: "備份已還原" })).toBeVisible();

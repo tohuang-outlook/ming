@@ -1489,3 +1489,8 @@ textarea {
 .chenggu-verse { margin: 24px 0; padding: 24px; border: 1px solid var(--border); border-radius: 8px; background: #20251b; }
 .chenggu-verse blockquote { margin: 20px 0; font-family: serif; color: var(--gold); font-size: clamp(1rem, 2.5vw, 1.3rem); line-height: 1.9; letter-spacing: .08em; }
 .chenggu-verse blockquote p { margin: 0; }
+
+.profile-switcher label { display: flex; align-items: center; gap: 8px; font-size: .8rem; }
+.profile-switcher select { width: clamp(120px, 20vw, 260px); min-height: 36px; margin: 0; padding: 6px; font-size: .8rem; }
+.profile-switcher [role="alert"] { color: #e5a893; font-size: .75rem; }
+@media (max-width: 680px) { .topbar { flex-wrap: wrap; gap: 10px; } .top-actions { flex-wrap: wrap; } .profile-switcher label > span { display: none; } }
