@@ -27,7 +27,7 @@ try {
   await expect(page.getByRole("heading", { name: "DeepSeek AI 設定" })).toBeVisible();
   const fakeKey = "sk-" + "a".repeat(32);
   await page.getByLabel("DeepSeek API 金鑰", { exact: true }).fill(fakeKey);
-  await page.getByLabel("在此 Mac 加密記住金鑰").check();
+  await expect(page.getByLabel("在此 Mac 加密記住金鑰")).toBeChecked();
   await page.getByRole("button", { name: "啟用 DeepSeek", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("金鑰已加密儲存", { timeout: 15000 });
   expect((await readFile(path.join(dataDir, "deepseek.enc"))).includes(Buffer.from(fakeKey))).toBe(false);
@@ -39,6 +39,9 @@ try {
   await page.getByRole("button", { name: "儲存並建立命盤" }).click();
   await page.waitForURL("**/dashboard");
   await nav("八字命理"); await expect(page.getByRole("heading", { name: "四柱命盤", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "袁天罡稱骨命重" })).toBeVisible();
+  await expect(page.getByTestId("chenggu-total")).toHaveText("三兩七錢");
+  passed("Chenggu known lunar date weight displayed");
   await nav("紫微斗數"); await expect(page.getByText("木三局", { exact: true })).toBeVisible();
   await page.reload(); await expect(page.getByText("木三局", { exact: true })).toBeVisible();
   passed("birth profile + Bazi + Ziwei + reload");
@@ -46,7 +49,10 @@ try {
   expect(await page.evaluate(() => window.mingliDesktop.status())).toMatchObject({ configured: true, remembered: true });
   await nav("紫微斗數"); await expect(page.getByText("木三局", { exact: true })).toBeVisible();
   passed("profile and encrypted key survive full app restart");
-  expect(await page.evaluate(() => window.mingliDesktop.clearKey())).toEqual({});
+  await nav("設定");
+  await page.getByRole("button", { name: "移除金鑰", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText("已移除金鑰");
+  expect(await page.evaluate(() => window.mingliDesktop.status())).toMatchObject({ configured: false, remembered: false });
   await expect(stat(path.join(dataDir, "deepseek.enc"))).rejects.toMatchObject({ code: "ENOENT" });
   passed("key deletion");
   const apiKey = process.env.DEEPSEEK_API_KEY;

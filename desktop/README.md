@@ -4,13 +4,13 @@ macOS Apple Silicon（M1 或更新），macOS 13 或更新。以 Electron 44 打
 
 ## 建置
 
-在 macOS arm64 執行 `npm ci`、`npm run package:desktop`。產物在 `outputs/desktop-build/`，應用程式版本 1.2.1。靜態畫面在獨立的 `work/desktop-source` 匯出，API routes 與網站 proxy 不會帶入桌面版。主程序與 preload 使用 esbuild 打包，發行檔案採明確白名單。建置會掃描本機已知秘密並拒絕包含它們的安裝內容。
+在 macOS arm64 執行 `npm ci`、`npm run package:desktop`。產物在 `outputs/desktop-build/`，應用程式版本 1.3.0。靜態畫面在獨立的 `work/desktop-source` 匯出，API routes 與網站 proxy 不會帶入桌面版。主程序與 preload 使用 esbuild 打包，發行檔案採明確白名單。建置會掃描本機已知秘密並拒絕包含它們的安裝內容。
 
 ## 安全邊界
 
 - Renderer 使用 sandbox、contextIsolation、停用 Node integration；只有七個具名 IPC 方法，主程序驗證來源與主框架。
 - `mingli://app` 提供內建資源，拒絕跨來源導覽、彈出視窗、裝置權限與 renderer 對外請求。CSP 對 Next 靜態 inline scripts 使用 SHA-256 hashes。
-- DeepSeek API 固定連線 `https://api.deepseek.com`；API key 僅主程序持有。未勾選記住時只存記憶體；記住時使用 Electron safeStorage 的 macOS Keychain 保護加密，密文存於 userData，權限 0600。不支援明文降級。
+- DeepSeek API 固定連線 `https://api.deepseek.com`；API key 僅主程序持有。預設勾選在本機加密記住金鑰，重啟自動載入，可在設定移除。取消勾選時只存記憶體；記住時使用 Electron safeStorage 的 macOS Keychain 保護加密，密文存於 userData，權限 0600。不支援明文降級。
 - 每日 40 次／每分鐘 8 次限制，UTC 換日；額度檔先原子更新，再送出請求。這是個人 App 的避免誤用措施，無法防止本機使用者自行修改檔案。
 - 原始命盤不交給模型重算；共用網站版的隱私投影、schema 驗證與 fact ID 引用驗證。
 - 沒有自動更新；升級先匯出備份，再用新 App 取代舊 App。加密金鑰可在設定移除；刪除命盤資料不會自動刪除金鑰。
@@ -35,7 +35,7 @@ macOS Apple Silicon（M1 或更新），macOS 13 或更新。以 Electron 44 打
 
 驗證：`MINGLI_FACE_FIXTURE=/path/to/licensed-portrait.jpg node scripts/test-face-desktop.mjs`。測試照片不納入 App；本次使用 matplotlib sample_data 的 Grace Hopper 美國海軍公開領域照片（James S. Davis），出處：[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Grace_Hopper.jpg)。
 
-## 可重現的發行檢查（1.2.1）
+## 可重現的發行檢查（1.3.0）
 
 `npm run verify:desktop` 會驗證 App 的完整簽章、DMG 校驗、已打包程式與建置程式一致、秘密掃描、SHA-256，並寫出 `outputs/desktop-build/release-manifest.json`。清楚區分 `private-local-use` 與 `notarized-distribution`；沒有公證票據不會標示為 Apple 已公證。
 
@@ -57,3 +57,7 @@ npm run package:desktop:release
 升級／回復：先在 App 匯出命盤備份並保存到安全位置，結束 App 後取代 Applications 中的 App。保持 userData 路徑不變可保留紀錄。若需回復舊版，先再次匯出當下備份，再取代 App 本體；不要清除 userData。面相 JSON 匯出檔須另外保管。
 
 參考：[Apple 公證流程](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow)、[GitHub macOS runner](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)。
+
+## 1.3.0 稱骨命重
+
+八字命盤新增袁天罡稱骨的四項重量、總重與邊界規則；規則與來源見 `docs/chenggu.md`。歷史八字可依既存排盤時間重新顯示，不改變原始四柱。

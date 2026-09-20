@@ -22,9 +22,9 @@ export function DesktopAccess() {
     finally { setBusy(false); }
   }}>
     <h2>DeepSeek AI 設定</h2>
-    <p className="small muted">AI 解讀由這部 Mac 直接連線至 DeepSeek，使用你的 API 額度。金鑰不會加入命盤備份。勾選記住時，使用 macOS 鑰匙圈保護的加密儲存；未勾選則只保留於本次 App 執行期間。</p>
+    <p className="small muted">AI 解讀由這部 Mac 直接連線至 DeepSeek，使用你的 API 額度。金鑰不會加入命盤備份。預設在此 Mac 加密保存，重新開啟 App 後仍可使用；可隨時按「移除金鑰」刪除。取消勾選則只保留於本次 App 執行期間。</p>
     <label>DeepSeek API 金鑰<input name="key" type="password" autoComplete="off" spellCheck={false} required minLength={16} maxLength={256} /></label>
-    <label><input type="checkbox" name="remember" /> 在此 Mac 加密記住金鑰</label>
+    <label><input type="checkbox" name="remember" defaultChecked /> 在此 Mac 加密記住金鑰</label>
     <div className="actions">
       <button className="button primary" disabled={busy}>{busy ? "處理中…" : "啟用 DeepSeek"}</button>
       <button className="button" type="button" disabled={busy} onClick={async () => {

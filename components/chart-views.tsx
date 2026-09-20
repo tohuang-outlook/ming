@@ -1,4 +1,5 @@
 "use client";
+import { ChengguView } from "./chenggu-view";
 import { useState } from "react";
 import type { BaziChart } from "@/lib/bazi";
 import type { ZiWeiChart } from "@/lib/ziwei";
@@ -43,6 +44,7 @@ export function BaziView({ chart }: { chart: BaziChart }) {
           ))}
         </div>
       </section>
+      <ChengguView calculationTime={chart.meta.calculationTime} />
       <div className="two-col equal">
         <section className="panel">
           <h2>五行分布</h2>
