@@ -20,7 +20,7 @@ try {
   else {
     run(process.execPath, ["scripts/build-desktop.mjs"]);
     // electron-builder notarizes and staples the signed .app before building the DMG.
-    run("node_modules/.bin/electron-builder", ["--config", "desktop/electron-builder.yml", "--mac", "dmg", "--arm64", "--config.forceCodeSigning=true", `--config.mac.identity=${identity}`, "--config.mac.notarize=true", "--config.dmg.sign=true"]);
+    run("node_modules/.bin/electron-builder", ["--config", "desktop/electron-builder.yml", "--mac", "dmg", "--arm64", "--publish", "never", "--config.forceCodeSigning=true", `--config.mac.identity=${identity}`, "--config.mac.notarize=true", "--config.dmg.sign=true"]);
     const { version } = JSON.parse(await readFile("work/desktop-app/package.json", "utf8"));
     const dmg = `outputs/desktop-build/Zhonghua-Mingli-AI-${version}-arm64.dmg`;
     const app = "outputs/desktop-build/mac-arm64/中華命理 AI.app";

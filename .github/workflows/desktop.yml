@@ -42,7 +42,7 @@ jobs:
           echo 'a8ca6d734765703b09728ab47fe59f473d93ae3967fc24c7c0288c3c7adb7130  work/face-test.jpg' | shasum -a 256 --check
           MINGLI_FACE_FIXTURE=work/face-test.jpg node scripts/test-face-desktop.mjs
       - name: Build private-use DMG (not Apple notarized)
-        run: npx electron-builder --config desktop/electron-builder.yml --mac dmg --arm64
+        run: npx electron-builder --config desktop/electron-builder.yml --mac dmg --arm64 --publish never
       - run: npm run verify:desktop
       - uses: actions/upload-artifact@v4
         with:
