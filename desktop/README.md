@@ -4,7 +4,7 @@ macOS Apple Silicon（M1 或更新），macOS 13 或更新。以 Electron 44 打
 
 ## 建置
 
-在 macOS arm64 執行 `npm ci`、`npm run package:desktop`。產物在 `outputs/desktop-build/`，應用程式版本 1.3.1。靜態畫面在獨立的 `work/desktop-source` 匯出，API routes 與網站 proxy 不會帶入桌面版。主程序與 preload 使用 esbuild 打包，發行檔案採明確白名單。建置會掃描本機已知秘密並拒絕包含它們的安裝內容。
+在 macOS arm64 執行 `npm ci`、`npm run package:desktop`。產物在 `outputs/desktop-build/`，應用程式版本 1.4.0。靜態畫面在獨立的 `work/desktop-source` 匯出，API routes 與網站 proxy 不會帶入桌面版。主程序與 preload 使用 esbuild 打包，發行檔案採明確白名單。建置會掃描本機已知秘密並拒絕包含它們的安裝內容。
 
 ## 安全邊界
 
@@ -63,3 +63,5 @@ npm run package:desktop:release
 八字命盤新增袁天罡稱骨的四項重量、總重與邊界規則；規則與來源見 `docs/chenggu.md`。歷史八字可依既存排盤時間重新顯示，不改變原始四柱。
 
 1.3.1：無效歷史時間只停用該筆稱骨，不影響其餘命盤顯示。發行驗證增加完整 renderer 比對，並掛載 DMG 驗證內含 App 的簽章及封裝內容。
+
+1.4.0：称骨結果新增二兩一錢至七兩一錢全 51 首傳統歌訣，繁體中文、七言四句，離線查表。版本說明見 docs/chenggu.md。

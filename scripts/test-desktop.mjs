@@ -41,6 +41,9 @@ try {
   await nav("八字命理"); await expect(page.getByRole("heading", { name: "四柱命盤", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "袁天罡稱骨命重" })).toBeVisible();
   await expect(page.getByTestId("chenggu-total")).toHaveText("三兩七錢");
+  await expect(page.getByRole("heading", { name: "三兩七錢・稱骨歌" })).toBeVisible();
+  await expect(page.locator(".chenggu-verse blockquote p")).toHaveCount(4);
+  await expect(page.locator(".chenggu-verse blockquote")).toContainText("此命般般事不成");
   await page.locator("section[aria-labelledby=chenggu-title]").screenshot({ path: "outputs/chenggu-preview.png" });
   passed("Chenggu known lunar date weight displayed");
   await nav("紫微斗數"); await expect(page.getByText("木三局", { exact: true })).toBeVisible();
