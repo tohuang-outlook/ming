@@ -41,6 +41,7 @@ try {
   await nav("八字命理"); await expect(page.getByRole("heading", { name: "四柱命盤", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "袁天罡稱骨命重" })).toBeVisible();
   await expect(page.getByTestId("chenggu-total")).toHaveText("三兩七錢");
+  await page.locator("section[aria-labelledby=chenggu-title]").screenshot({ path: "outputs/chenggu-preview.png" });
   passed("Chenggu known lunar date weight displayed");
   await nav("紫微斗數"); await expect(page.getByText("木三局", { exact: true })).toBeVisible();
   await page.reload(); await expect(page.getByText("木三局", { exact: true })).toBeVisible();
@@ -89,7 +90,7 @@ try {
   await page.getByRole("button", { name: "確認取代並還原", exact: true }).click();
   await expect(page.getByRole("status").filter({ hasText: "備份已還原" })).toBeVisible();
   passed("IChing + history + backup export/import");
-  await nav("八字命理"); await page.screenshot({ path: "outputs/desktop-app-preview.png" });
+  await nav("八字命理"); await expect(page.getByRole("heading", { name: "四柱命盤", exact: true })).toBeVisible(); await page.screenshot({ path: "outputs/desktop-app-preview.png" });
   if (apiKey) {
     const storage = await page.evaluate(() => JSON.stringify({ ...localStorage })); expect(storage.includes(apiKey)).toBe(false);
     await expect(stat(path.join(dataDir, "deepseek.enc"))).rejects.toMatchObject({ code: "ENOENT" });
