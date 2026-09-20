@@ -45,3 +45,13 @@ describe("traditional Chenggu weights", () => {
     expect(formatWeight(40)).toBe("四兩整"); expect(() => formatWeight(3.7)).toThrow();
   });
 });
+
+it.each(["", "broken", "2000-08-16", "2000-08-16T03:00:00-07:00", "1900-08-16 03:00:00", "2100-08-16 03:00:00"])("rejects invalid or ambiguous historical calculation time %s", time => {
+  expect(() => calculateChenggu(time)).toThrow();
+});
+it.each(["1901-01-01 00:00:00", "2099-12-31 23:59:00"])("supported boundary remains calculable: %s", time => {
+  const result = calculateChenggu(time);
+  expect(Number.isInteger(result.totalQian)).toBe(true);
+  expect(result.totalQian).toBeGreaterThanOrEqual(21);
+  expect(result.totalQian).toBeLessThanOrEqual(71);
+});

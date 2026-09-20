@@ -1,7 +1,11 @@
 import { Fragment } from "react";
 import { calculateChenggu, formatWeight } from "@/lib/chenggu";
 export function ChengguView({ calculationTime }: { calculationTime: string }) {
-  const result = calculateChenggu(calculationTime);
+  let result: ReturnType<typeof calculateChenggu>;
+  try { result = calculateChenggu(calculationTime); }
+  catch {
+    return <section className="panel"><h2>袁天罡稱骨命重</h2><p role="status">這筆紀錄的排盤時間無法用於稱骨計算。原有命盤仍保留，請確認出生資料後重新排盤。</p></section>;
+  }
   return <section className="panel" aria-labelledby="chenggu-title">
     <div className="section-heading"><h2 id="chenggu-title">袁天罡稱骨命重</h2><strong className="gold" data-testid="chenggu-total">{result.weight}</strong></div>
     <p className="small muted">農曆 {result.lunarYear} 年{result.leap ? "閏" : ""}{result.month} 月 {result.day} 日 · 四項相加，十錢為一兩。</p>

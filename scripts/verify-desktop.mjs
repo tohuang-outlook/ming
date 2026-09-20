@@ -1,4 +1,4 @@
-import { readFile, writeFile, mkdir, mkdtemp, rm } from "node:fs/promises";
+import { readFile, writeFile, mkdir, mkdtemp, rm, readdir } from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
@@ -8,6 +8,15 @@ function command(binary, args, capture = false) {
   const result = spawnSync(binary, args, { encoding: "utf8", stdio: capture ? "pipe" : "inherit" });
   if (result.status !== 0) throw new Error(`${binary} verification failed.`);
   return (result.stdout ?? "") + (result.stderr ?? "");
+}
+async function sameTree(left, right) {
+  const names = (await readdir(left)).sort();
+  if (JSON.stringify(names) !== JSON.stringify((await readdir(right)).sort())) throw new Error("Packaged file inventory differs from tested payload.");
+  for (const entry of await readdir(left, { withFileTypes: true })) {
+    const a = path.join(left, entry.name), b = path.join(right, entry.name);
+    if (entry.isDirectory()) await sameTree(a, b);
+    else if (!entry.isFile() || !(await readFile(a)).equals(await readFile(b))) throw new Error("Packaged file differs from tested payload.");
+  }
 }
 const requireNotarized = process.argv.includes("--require-notarized");
 const app = path.resolve("outputs/desktop-build/mac-arm64/中華命理 AI.app");
@@ -23,12 +32,27 @@ try {
   for (const name of ["main.cjs", "preload.cjs"]) {
     if (!(await readFile(path.join(extracted, name))).equals(await readFile(path.join("work/desktop-app", name)))) throw new Error("Packaged code differs from the built payload.");
   }
+  await sameTree(path.join(extracted, "renderer"), path.resolve("work/desktop-app/renderer"));
   const { version } = JSON.parse(await readFile(path.join(extracted, "package.json"), "utf8"));
   const filename = `Zhonghua-Mingli-AI-${version}-arm64.dmg`;
   const dmg = path.resolve("outputs/desktop-build", filename);
   command("codesign", ["--verify", "--deep", "--strict", app]);
   const signature = command("codesign", ["-dv", "--verbose=2", app], true);
   command("hdiutil", ["verify", dmg], true);
+  const mount = await mkdtemp(path.resolve("work/dmg-check-"));
+  let attached = false;
+  try {
+    command("hdiutil", ["attach", "-readonly", "-nobrowse", "-mountpoint", mount, dmg], true);
+    attached = true;
+    const mountedApp = path.join(mount, "中華命理 AI.app");
+    command("codesign", ["--verify", "--deep", "--strict", mountedApp], true);
+    for (const relative of ["Contents/Resources/app.asar", "Contents/Resources/native/face-landmarks", "Contents/Info.plist", "Contents/MacOS/中華命理 AI"]) {
+      if (!(await readFile(path.join(mountedApp, relative))).equals(await readFile(path.join(app, relative)))) throw new Error("DMG contains a different app than the verified build.");
+    }
+  } finally {
+    if (attached) command("hdiutil", ["detach", mount], true);
+    await rm(mount, { recursive: true, force: true });
+  }
   const notary = spawnSync("xcrun", ["stapler", "validate", dmg], { encoding: "utf8", stdio: "pipe" });
   const notarized = notary.status === 0;
   if (requireNotarized) {
@@ -44,7 +68,7 @@ try {
   await writeFile(dmg + ".sha256", `${sha256}  ${filename}\n`);
   const commit = command("git", ["rev-parse", "HEAD"], true).trim();
   const dirty = command("git", ["status", "--porcelain"], true).trim().length > 0;
-  const report = { version, checkedAt: new Date().toISOString(), sourceCommit: commit, sourceDirty: dirty, architecture: "arm64", minimumMacOS, bytes: bytes.length, sha256, secretScanPassed: true, signatureValid: true, signing: signature.includes("Signature=adhoc") ? "ad-hoc" : "Developer ID", notarized, releaseClass: notarized ? "notarized-distribution" : "private-local-use", dmgVerified: true };
+  const report = { version, checkedAt: new Date().toISOString(), sourceCommit: commit, sourceDirty: dirty, architecture: "arm64", minimumMacOS, bytes: bytes.length, sha256, secretScanPassed: true, signatureValid: true, signing: signature.includes("Signature=adhoc") ? "ad-hoc" : "Developer ID", notarized, releaseClass: notarized ? "notarized-distribution" : "private-local-use", dmgVerified: true, dmgPayloadMatched: true, rendererMatched: true };
   await writeFile("outputs/desktop-build/release-manifest.json", JSON.stringify(report, null, 2));
   console.log(JSON.stringify(report, null, 2));
 } finally { await rm(extracted, { recursive: true, force: true }); }

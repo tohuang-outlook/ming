@@ -1,6 +1,6 @@
 import { Solar } from "lunar-typescript";
 import { Temporal } from "@js-temporal/polyfill";
-import { doubleHour, SEXAGENARY_CYCLE } from "@/lib/calendar";
+import { doubleHour, SEXAGENARY_CYCLE, validateYear } from "@/lib/calendar";
 
 // Traditional numerical lookup data; units are integer qian (10 qian = 1 liang).
 // Sources and boundary conventions: docs/chenggu.md.
@@ -16,7 +16,9 @@ export function formatWeight(qian: number) {
 }
 /** Input is the chart's already resolved UTC+08:00 time; never browser local time. */
 export function calculateChenggu(calculationTime: string) {
+  if (!/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}$/.test(calculationTime)) throw new Error("排盤時間格式不正確。");
   const time = Temporal.PlainDateTime.from(calculationTime.replace(" ", "T"), { overflow: "reject" });
+  validateYear(time.year);
   const birth = Solar.fromYmdHms(time.year, time.month, time.day, time.hour, time.minute, time.second);
   const shifted = time.hour === 23;
   const lunar = (shifted ? birth.next(1) : birth).getLunar();
