@@ -1,7 +1,12 @@
 "use client";
-import { useState } from "react";
+import { DesktopAccess } from "./desktop-access";
+import { useSyncExternalStore, useState } from "react";
 import { ErrorNotice } from "./ui";
 export function AIAccess() {
+  const desktop = useSyncExternalStore(() => () => {}, () => !!window.mingliDesktop, () => false);
+  return desktop ? <DesktopAccess /> : <WebAIAccess />;
+}
+function WebAIAccess() {
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);

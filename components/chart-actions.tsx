@@ -43,15 +43,20 @@ export function ChartActions({
     setBusy(true);
     setError("");
     try {
+      const payload = prepareInterpretation(chart, question, annualBazi);
+      let body;
+      if (window.mingliDesktop) {
+        body = await window.mingliDesktop.interpret(payload);
+        if (body.error) throw new Error(body.error);
+      } else {
       const response = await fetch("/api/interpret", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(
-          prepareInterpretation(chart, question, annualBazi),
-        ),
+        body: JSON.stringify(payload),
       });
-      const body = await response.json();
+      body = await response.json();
       if (!response.ok) throw new Error(body.error ?? "AI 解讀失敗。");
+      }
       const data = InterpretationSchema.parse(body.interpretation);
       setResult({ key, data });
       setMessage("解讀已完成，請按保存紀錄留存。");

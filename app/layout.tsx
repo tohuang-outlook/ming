@@ -18,7 +18,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await connection();
+  if (process.env.MINGLI_DESKTOP_BUILD !== "1") await connection();
   return (
     <html lang="zh-Hant">
       <body>

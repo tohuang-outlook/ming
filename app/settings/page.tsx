@@ -39,8 +39,14 @@ export default function SettingsPage() {
       setError(e instanceof Error ? e.message : "儲存失敗。");
     }
   }
-  function exportData() {
+  async function exportData() {
     try {
+      if (window.mingliDesktop) {
+        const result = await window.mingliDesktop.exportBackup(localStorage.getItem(STORAGE_KEY) ?? JSON.stringify(EMPTY_STORE));
+        if (result.error) throw new Error(result.error);
+        if (!result.canceled) { setMessage("備份已匯出。"); setError(""); }
+        return;
+      }
       const blob = new Blob(
         [localStorage.getItem(STORAGE_KEY) ?? JSON.stringify(EMPTY_STORE)],
         { type: "application/json" },
@@ -136,7 +142,7 @@ export default function SettingsPage() {
       <section className="panel settings-form">
         <h2>裝置資料</h2>
         <p className="muted small">
-          出生資料目前儲存在你的裝置中。清除瀏覽器資料會一併移除命盤；備份含個人資料，請妥善保管。
+          出生資料目前儲存在你的裝置中。清除 App 或瀏覽器的儲存資料會一併移除命盤；備份含個人資料，請妥善保管。
         </p>
         <div className="actions">
           <button className="button" onClick={exportData}>

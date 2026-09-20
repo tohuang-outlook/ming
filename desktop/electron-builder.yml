@@ -1,0 +1,45 @@
+appId: com.tohuang.mingli
+productName: 中華命理 AI
+asar: true
+beforeBuild: desktop/before-build.cjs
+electronVersion: 44.4.3
+directories:
+  app: work/desktop-app
+  output: outputs/desktop-build
+files:
+  - main.cjs
+  - preload.cjs
+  - renderer/**
+  - package.json
+  - LICENSE
+  - THIRD_PARTY_NOTICES.txt
+mac:
+  target:
+    - target: dmg
+      arch: [arm64]
+  category: public.app-category.lifestyle
+  identity: "-"
+  hardenedRuntime: true
+  notarize: false
+  minimumSystemVersion: "12.0"
+  icon: desktop/icon.icns
+  artifactName: Zhonghua-Mingli-AI-${version}-${arch}.${ext}
+dmg:
+  sign: false
+  title: 中華命理 AI
+  contents:
+    - x: 145
+      y: 160
+      type: file
+    - x: 415
+      y: 160
+      type: link
+      path: /Applications
+
+electronFuses:
+  runAsNode: false
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  enableEmbeddedAsarIntegrityValidation: true
+  onlyLoadAppFromAsar: true
+  grantFileProtocolExtraPrivileges: false

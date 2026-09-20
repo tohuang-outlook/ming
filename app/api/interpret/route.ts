@@ -1,11 +1,7 @@
-import OpenAI from "openai";
-import { zodTextFormat } from "openai/helpers/zod";
+import { interpretWithDeepSeek } from "@/lib/interpretation/service";
 import {
   InterpretRequestSchema,
-  InterpretationSchema,
-  chartFacts,
 } from "@/lib/interpretation/schema";
-import { SYSTEM_PROMPT } from "@/lib/interpretation/prompt";
 import {
   guardOrigin,
   guardAccess,
@@ -26,52 +22,9 @@ export async function POST(request: Request) {
         "AI 尚未啟用。請在伺服器設定 DEEPSEEK_API_KEY；命盤計算與保存仍可使用。",
       );
     await productionBudget("interpret");
-    const facts = chartFacts(input);
     try {
-      const client = new OpenAI({
-        apiKey: process.env.DEEPSEEK_API_KEY,
-        baseURL: "https://api.deepseek.com",
-        timeout: 45000,
-        maxRetries: 0,
-      });
-      const response = await client.responses.parse(
-        {
-          model: process.env.DEEPSEEK_MODEL ?? "deepseek-flash",
-          reasoning: { effort: "none" },
-          instructions: SYSTEM_PROMPT,
-          input: JSON.stringify({
-            system: input.system,
-            facts,
-            question: input.question,
-            language: input.language,
-          }),
-          text: {
-            format: zodTextFormat(
-              InterpretationSchema,
-              "mingli_interpretation",
-            ),
-          },
-          max_output_tokens: 5000,
-        },
-        { signal: request.signal },
-      );
-      if (response.status !== "completed") throw new Error("Incomplete response");
-      const parsed = InterpretationSchema.safeParse(response.output_parsed);
-      if (!parsed.success) throw new Error("Invalid response");
-      const ids = new Set(facts.map((f) => f.id));
-      if (
-        parsed.data.sections.some(
-          (s) => s.factIds.length === 0 || s.factIds.some((id) => !ids.has(id)),
-        )
-      )
-        throw new Error("Invalid evidence");
-      return Response.json(
-        {
-          interpretation: parsed.data,
-          model: process.env.DEEPSEEK_MODEL ?? "deepseek-flash",
-        },
-        { headers: { "Cache-Control": "no-store" } },
-      );
+      const result = await interpretWithDeepSeek(input, process.env.DEEPSEEK_API_KEY, process.env.DEEPSEEK_MODEL, request.signal);
+      return Response.json(result, { headers: { "Cache-Control": "no-store" } });
     } catch {
       throw new HttpError(
         502,
