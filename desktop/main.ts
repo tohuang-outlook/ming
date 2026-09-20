@@ -4,6 +4,7 @@ import { readFile, writeFile, mkdir, rename, rm, stat } from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { interpretWithDeepSeek } from "../lib/interpretation/service";
+import { analyzeFace, makeFaceReport } from "./face";
 import { parseBackup } from "../lib/storage";
 import { InterpretRequestSchema } from "../lib/interpretation/schema";
 import { APP_ORIGIN, trustedURL, assetPath, takeBudget, type Budget } from "./policy";
@@ -19,6 +20,7 @@ let remembered = false;
 let keyError = false;
 let aiBusy = false;
 let settingsBusy = false;
+let faceBusy = false;
 const keyPath = () => path.join(app.getPath("userData"), "deepseek.enc");
 async function atomicWrite(filename: string, contents: string | Buffer) {
   await mkdir(path.dirname(filename), { recursive: true, mode: 0o700 });
@@ -44,6 +46,20 @@ function handle(channel: string, callback: (...args: unknown[]) => Promise<unkno
   });
 }
 function installIPC() {
+  handle("mingli:analyze-face", async raw => {
+    if (faceBusy) return { error: "正在分析另一張照片，請稍候。" };
+    faceBusy = true;
+    try { return await analyzeFace(path.join(app.isPackaged ? process.resourcesPath : __dirname, "native/face-landmarks"), raw); }
+    catch { return { error: "本機分析未完成，請換一張正面照片後重試。" }; }
+    finally { faceBusy = false; }
+  });
+  handle("mingli:export-face", async raw => {
+    const report = makeFaceReport(raw);
+    const result = await dialog.showSaveDialog(mainWindow!, { title: "儲存面相文化觀察", defaultPath: "面相文化觀察.json", filters: [{ name: "JSON 觀察紀錄", extensions: ["json"] }] });
+    if (result.canceled || !result.filePath) return { canceled: true };
+    await atomicWrite(result.filePath, JSON.stringify(report, null, 2));
+    return {};
+  });
   handle("mingli:export-backup", async (raw) => {
     if (typeof raw !== "string" || raw.length > 8_000_000) return { error: "備份格式或大小不正確。" };
     const backup = parseBackup(raw);

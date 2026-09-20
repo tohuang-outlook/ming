@@ -6,6 +6,9 @@ electronVersion: 44.4.3
 directories:
   app: work/desktop-app
   output: outputs/desktop-build
+extraResources:
+  - from: work/desktop-app/native
+    to: native
 files:
   - main.cjs
   - preload.cjs
@@ -18,6 +21,8 @@ mac:
     - target: dmg
       arch: [arm64]
   category: public.app-category.lifestyle
+  binaries:
+    - Contents/Resources/native/face-landmarks
   identity: "-"
   hardenedRuntime: true
   notarize: false

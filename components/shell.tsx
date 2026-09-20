@@ -11,6 +11,7 @@ import {
   History,
   Settings,
   ShieldCheck,
+  ScanFace,
 } from "lucide-react";
 import { DISCLAIMER } from "@/types";
 const links = [
@@ -19,6 +20,7 @@ const links = [
   ["/bazi", "八字命理", Layers3],
   ["/ziwei", "紫微斗數", Orbit],
   ["/fortune", "流年運勢", CalendarDays],
+  ["/face", "面相觀察", ScanFace],
   ["/dashboard", "我的命盤", UserRound],
   ["/history", "歷史紀錄", History],
   ["/settings", "設定", Settings],
@@ -40,12 +42,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </Link>
         <p className="nav-label">探索命理</p>
         <nav aria-label="主要導覽">
-          {links.map(([url, label, Icon], i) => (
+          {links.map(([url, label, Icon]) => (
             <Link
               key={url}
               href={url}
               aria-current={path === url ? "page" : undefined}
-              className={`${path === url ? "active" : ""} ${i === 5 ? "nav-break" : ""}`}
+              className={`${path === url ? "active" : ""} ${url === "/dashboard" ? "nav-break" : ""}`}
             >
               <Icon size={19} />
               {label}
@@ -86,7 +88,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </footer>
       </div>
       <nav className="mobile-nav" aria-label="手機導覽">
-        {[links[0], links[1], links[2], links[3], links[5]].map(
+        {[links[0], links[1], links[2], links[3], links[6]].map(
           ([url, label, Icon]) => (
             <Link
               href={url}

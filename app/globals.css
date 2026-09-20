@@ -1464,3 +1464,24 @@ textarea {
     font-size: 0.875rem;
   }
 }
+
+/* Offline face observation */
+.face-privacy { align-items: flex-start; gap: 12px; }
+.face-privacy svg { flex-shrink: 0; }
+.face-intake { display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px; align-items: center; margin: 24px 0; }
+.face-intake svg { color: var(--gold, #d7b879); }
+.face-results { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 24px; margin-top: 24px; align-items: start; }
+.face-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+.face-toolbar h2 { margin: 0; }
+.face-toolbar label, .face-save-option { display: flex; align-items: center; gap: 8px; }
+.face-toolbar input, .face-save-option input { width: auto; }
+.face-preview { display: block; width: 100%; max-height: 600px; background: #090c09; border-radius: 12px; }
+.face-legend { display: flex; flex-wrap: wrap; gap: 14px; }
+.face-observations dl > div { border-bottom: 1px solid #343a2d; padding: 14px 0; }
+.face-observations dd { font-size: 1.7rem; color: #e7c784; margin: 4px 0; }
+.face-observations dt { font-size: .9rem; }
+.face-save-option { margin-top: 24px; }
+.face-culture { margin-top: 40px; }
+.face-culture-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.face-culture-grid h3 { font-size: 1.05rem; }
+@media (max-width: 1050px) { .face-results, .face-intake { grid-template-columns: 1fr; } .face-culture-grid { grid-template-columns: 1fr; } }
