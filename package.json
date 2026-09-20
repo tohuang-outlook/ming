@@ -17,7 +17,10 @@
     "build:sites": "npm run build:cloudflare && node scripts/prepare-sites.mjs",
     "build:desktop": "node scripts/build-desktop.mjs",
     "package:desktop": "npm run build:desktop && electron-builder --config desktop/electron-builder.yml --mac dmg --arm64",
-    "test:desktop": "node scripts/test-desktop.mjs"
+    "test:desktop": "node scripts/test-desktop.mjs",
+    "verify:desktop": "node scripts/verify-desktop.mjs",
+    "package:desktop:release": "node scripts/package-desktop-release.mjs",
+    "check:desktop:signing": "node scripts/package-desktop-release.mjs --check"
   },
   "dependencies": {
     "@js-temporal/polyfill": "^0.5.1",
@@ -33,6 +36,7 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
+    "@electron/asar": "^3.4.1",
     "@playwright/test": "^1.55.0",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.0.0",

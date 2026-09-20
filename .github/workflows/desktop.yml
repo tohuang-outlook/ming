@@ -1,0 +1,65 @@
+name: macOS desktop release checks
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'desktop/**'
+      - 'scripts/*desktop*'
+      - 'scripts/release-security.mjs'
+      - '.github/workflows/desktop.yml'
+      - 'app/**'
+      - 'components/**'
+      - 'lib/**'
+      - 'types/**'
+      - 'package*.json'
+permissions:
+  contents: read
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  desktop:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: test "$(uname -m)" = arm64
+      - run: npm ci
+      - run: npm audit --audit-level=moderate
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build:desktop
+      - name: Verify desktop flows
+        run: npm run test:desktop
+      - name: Verify offline face observation with public-domain fixture
+        run: |
+          curl --fail --location --retry 2 --max-time 60 https://raw.githubusercontent.com/matplotlib/matplotlib/main/lib/matplotlib/mpl-data/sample_data/grace_hopper.jpg --output work/face-test.jpg
+          echo 'a8ca6d734765703b09728ab47fe59f473d93ae3967fc24c7c0288c3c7adb7130  work/face-test.jpg' | shasum -a 256 --check
+          MINGLI_FACE_FIXTURE=work/face-test.jpg node scripts/test-face-desktop.mjs
+      - name: Build private-use DMG (not Apple notarized)
+        run: npx electron-builder --config desktop/electron-builder.yml --mac dmg --arm64
+      - run: npm run verify:desktop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mingli-private-macos-arm64-${{ github.sha }}
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            outputs/desktop-build/*.dmg
+            outputs/desktop-build/*.sha256
+            outputs/desktop-build/release-manifest.json
+            outputs/desktop-validation.json
+            outputs/face-desktop-validation.json
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: desktop-check-diagnostics
+          retention-days: 7
+          path: |
+            outputs/desktop-validation.json
+            outputs/face-desktop-validation.json

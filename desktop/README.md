@@ -1,10 +1,10 @@
 # 中華命理 AI 桌面版
 
-macOS Apple Silicon（M1 或更新），macOS 12 或更新。以 Electron 44 打包靜態 Next.js 畫面；不啟動 localhost，也不需要 Node.js、終端機或瀏覽器。出生資料與命盤保留在 App 的本機儲存；AI 解讀需要網路與使用者自己的 DeepSeek API key。
+macOS Apple Silicon（M1 或更新），macOS 13 或更新。以 Electron 44 打包靜態 Next.js 畫面；不啟動 localhost，也不需要 Node.js、終端機或瀏覽器。出生資料與命盤保留在 App 的本機儲存；AI 解讀需要網路與使用者自己的 DeepSeek API key。
 
 ## 建置
 
-在 macOS arm64 執行 `npm ci`、`npm run package:desktop`。產物在 `outputs/desktop-build/`，應用程式版本 1.2.0。靜態畫面在獨立的 `work/desktop-source` 匯出，API routes 與網站 proxy 不會帶入桌面版。主程序與 preload 使用 esbuild 打包，發行檔案採明確白名單。建置會掃描本機已知秘密並拒絕包含它們的安裝內容。
+在 macOS arm64 執行 `npm ci`、`npm run package:desktop`。產物在 `outputs/desktop-build/`，應用程式版本 1.2.1。靜態畫面在獨立的 `work/desktop-source` 匯出，API routes 與網站 proxy 不會帶入桌面版。主程序與 preload 使用 esbuild 打包，發行檔案採明確白名單。建置會掃描本機已知秘密並拒絕包含它們的安裝內容。
 
 ## 安全邊界
 
@@ -34,3 +34,26 @@ macOS Apple Silicon（M1 或更新），macOS 12 或更新。以 Electron 44 打
 建置原生程式需要 macOS arm64 和 Xcode Command Line Tools；`build:desktop` 會用 swiftc 編譯，electron-builder 會簽署並把 helper 放入 Resources/native。該二進位檔是明確的 extraResource，不含使用者照片。
 
 驗證：`MINGLI_FACE_FIXTURE=/path/to/licensed-portrait.jpg node scripts/test-face-desktop.mjs`。測試照片不納入 App；本次使用 matplotlib sample_data 的 Grace Hopper 美國海軍公開領域照片（James S. Davis），出處：[Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Grace_Hopper.jpg)。
+
+## 可重現的發行檢查（1.2.1）
+
+`npm run verify:desktop` 會驗證 App 的完整簽章、DMG 校驗、已打包程式與建置程式一致、秘密掃描、SHA-256，並寫出 `outputs/desktop-build/release-manifest.json`。清楚區分 `private-local-use` 與 `notarized-distribution`；沒有公證票據不會標示為 Apple 已公證。
+
+GitHub 的 `macOS desktop release checks` 使用 macOS arm64，執行型別檢查、單元測試、桌面流程、離線面相流程、DMG 建置及封裝驗證。只保留有期限的 CI artifacts，不建立公開 GitHub Release、不啟用自動更新。測試照片採公開領域來源並檢查固定 SHA-256。
+
+### Developer ID 正式對外發行
+
+先在此 Mac 的 Keychain 安裝自己的 **Developer ID Application 憑證與私鑰**，並用 Apple 的 `notarytool store-credentials` 互動設定一個 Keychain profile。不要把憑證密碼、Apple 密碼或 API key 寫進 repo 或貼到聊天。
+
+在本機環境指定 `MINGLI_SIGN_IDENTITY` 為完整的 Developer ID Application 憑證名稱、`APPLE_KEYCHAIN_PROFILE` 為既有公證 profile 名稱，然後依序執行：
+
+```
+npm run check:desktop:signing
+npm run package:desktop:release
+```
+
+流程會先驗證身分與公證存取權，完成 Developer ID 簽署、App 公證及 stapling、DMG 公證及 stapling，最後用 `spctl` 與 `stapler` 驗證。不具備憑證／profile、Apple 拒絕或驗證失敗時會以失敗結束，不降級成 ad-hoc 後聲稱成功。這條 Apple 流程在憑證尚未提供前只能完成程式與預檢；成功提交仍須真實憑證。
+
+升級／回復：先在 App 匯出命盤備份並保存到安全位置，結束 App 後取代 Applications 中的 App。保持 userData 路徑不變可保留紀錄。若需回復舊版，先再次匯出當下備份，再取代 App 本體；不要清除 userData。面相 JSON 匯出檔須另外保管。
+
+參考：[Apple 公證流程](https://developer.apple.com/documentation/security/customizing-the-notarization-workflow)、[GitHub macOS runner](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)。

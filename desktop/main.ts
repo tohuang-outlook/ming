@@ -1,9 +1,10 @@
 import { app, BrowserWindow, dialog, ipcMain, Menu, protocol, safeStorage, session } from "electron";
 import type { IpcMainInvokeEvent } from "electron";
-import { readFile, writeFile, mkdir, rename, rm, stat } from "node:fs/promises";
+import { readFile, rm, stat } from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { interpretWithDeepSeek } from "../lib/interpretation/service";
+import { atomicWrite } from "./files";
 import { analyzeFace, makeFaceReport } from "./face";
 import { parseBackup } from "../lib/storage";
 import { InterpretRequestSchema } from "../lib/interpretation/schema";
@@ -22,11 +23,6 @@ let aiBusy = false;
 let settingsBusy = false;
 let faceBusy = false;
 const keyPath = () => path.join(app.getPath("userData"), "deepseek.enc");
-async function atomicWrite(filename: string, contents: string | Buffer) {
-  await mkdir(path.dirname(filename), { recursive: true, mode: 0o700 });
-  await writeFile(filename + ".tmp", contents, { mode: 0o600 });
-  await rename(filename + ".tmp", filename);
-}
 async function loadKey() {
   try {
     const encrypted = await readFile(keyPath());
@@ -65,7 +61,7 @@ function installIPC() {
     const backup = parseBackup(raw);
     const result = await dialog.showSaveDialog(mainWindow!, { title: "匯出命盤備份", defaultPath: "中華命理-裝置備份.json", filters: [{ name: "JSON 備份", extensions: ["json"] }] });
     if (result.canceled || !result.filePath) return { canceled: true };
-    await writeFile(result.filePath, JSON.stringify(backup, null, 2), { mode: 0o600 });
+    await atomicWrite(result.filePath, JSON.stringify(backup, null, 2));
     return {};
   });
   handle("mingli:status", async () => ({ configured: !!apiKey, remembered, ...(keyError ? { error: "無法解鎖已存金鑰，請重新輸入或移除金鑰。" } : {}) }));

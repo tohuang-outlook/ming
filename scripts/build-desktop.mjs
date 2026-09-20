@@ -24,10 +24,10 @@ const result = spawnSync(process.execPath, [path.join(root, "node_modules/next/d
 if (result.status !== 0) process.exit(result.status ?? 1);
 await cp(path.join(staging, "out"), path.join(output, "renderer"), { recursive: true });
 for (const entry of ["main", "preload"]) await build({ entryPoints: [path.join(root, `desktop/${entry}.ts`)], bundle: true, platform: "node", format: "cjs", target: "node24", external: ["electron"], outfile: path.join(output, `${entry}.cjs`), sourcemap: false, minify: false });
-await writeFile(path.join(output, "package.json"), JSON.stringify({ name: "zhonghua-mingli-desktop", productName: "中華命理 AI", version: "1.2.0", description: "本機易經、八字與紫微排盤，DeepSeek AI 解讀", author: "Tony Huang", main: "main.cjs", private: true }, null, 2));
+await writeFile(path.join(output, "package.json"), JSON.stringify({ name: "zhonghua-mingli-desktop", productName: "中華命理 AI", version: "1.2.1", description: "本機易經、八字與紫微排盤，DeepSeek AI 解讀", author: "Tony Huang", main: "main.cjs", private: true }, null, 2));
 await cp(path.join(root, "LICENSE"), path.join(output, "LICENSE")).catch(e => { if (e.code !== "ENOENT") throw e; });
 await mkdir(path.join(output, "native"), { recursive: true });
-const native = spawnSync("xcrun", ["swiftc", "-O", "-target", "arm64-apple-macos12.0", "-module-cache-path", path.join(root, "work/swift-cache"), path.join(root, "desktop/face-landmarks.swift"), "-o", path.join(output, "native/face-landmarks")], { stdio: "inherit" });
+const native = spawnSync("xcrun", ["swiftc", "-O", "-target", "arm64-apple-macos13.0", "-module-cache-path", path.join(root, "work/swift-cache"), path.join(root, "desktop/face-landmarks.swift"), "-o", path.join(output, "native/face-landmarks")], { stdio: "inherit" });
 if (native.status !== 0) process.exit(native.status ?? 1);
 await writeDesktopNotices(path.join(output, "THIRD_PARTY_NOTICES.txt"));
 await verifyArtifactSecrets(output, root);
