@@ -9,13 +9,22 @@ function command(binary, args, capture = false) {
   if (result.status !== 0) throw new Error(`${binary} verification failed.`);
   return (result.stdout ?? "") + (result.stderr ?? "");
 }
+async function fileInventory(root, relative = "") {
+  const result = [];
+  for (const entry of await readdir(path.join(root, relative), { withFileTypes: true })) {
+    const name = path.join(relative, entry.name);
+    if (entry.isDirectory()) result.push(...await fileInventory(root, name));
+    else if (entry.isFile()) result.push(name);
+    else throw new Error("Unexpected non-regular file in renderer.");
+  }
+  return result.sort();
+}
 async function sameTree(left, right) {
-  const names = (await readdir(left)).sort();
-  if (JSON.stringify(names) !== JSON.stringify((await readdir(right)).sort())) throw new Error("Packaged file inventory differs from tested payload.");
-  for (const entry of await readdir(left, { withFileTypes: true })) {
-    const a = path.join(left, entry.name), b = path.join(right, entry.name);
-    if (entry.isDirectory()) await sameTree(a, b);
-    else if (!entry.isFile() || !(await readFile(a)).equals(await readFile(b))) throw new Error("Packaged file differs from tested payload.");
+  // ASAR drops empty directories; compare every actual file, not empty folders.
+  const names = await fileInventory(left);
+  if (JSON.stringify(names) !== JSON.stringify(await fileInventory(right))) throw new Error("Packaged file inventory differs from tested payload.");
+  for (const name of names) {
+    if (!(await readFile(path.join(left, name))).equals(await readFile(path.join(right, name)))) throw new Error("Packaged file differs from tested payload.");
   }
 }
 const requireNotarized = process.argv.includes("--require-notarized");
