@@ -108,6 +108,7 @@ small,
   min-height: 100vh;
 }
 .sidebar {
+  overflow-y: auto;
   width: 240px;
   position: fixed;
   inset: 0 auto 0 0;
@@ -1499,3 +1500,5 @@ textarea {
 .comparison-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
 .comparison-table th, .comparison-table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
 .comparison-table th { color: var(--gold); font-weight: 500; }
+
+.sidebar > * { flex-shrink: 0; }

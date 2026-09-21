@@ -16,6 +16,7 @@ async function nav(name) { await page.getByRole('navigation', { name: '主要導
 const profile = { id: 'legacy-a', name: '測試甲', gender: 'female', birthDate: '2000-08-16', birthTime: '03:00', birthLocation: '台北', timezone: 'Asia/Taipei', calendarType: 'Gregorian', isLeapMonth: false, createdAt: '2026-01-01T00:00:00.000Z' };
 try {
   await launch();
+  await page.setViewportSize({ width: 1280, height: 620 });
   await nav("雙人合盤");
   await expect(page.getByRole("heading", { name: "先建立兩位人物" })).toBeVisible();
   await page.evaluate(p => localStorage.setItem('zhonghua-mingli:v1', JSON.stringify({ version: 1, profile: p, settings: {}, history: [] })), profile);
