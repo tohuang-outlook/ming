@@ -16,6 +16,8 @@ async function nav(name) { await page.getByRole('navigation', { name: '主要導
 const profile = { id: 'legacy-a', name: '測試甲', gender: 'female', birthDate: '2000-08-16', birthTime: '03:00', birthLocation: '台北', timezone: 'Asia/Taipei', calendarType: 'Gregorian', isLeapMonth: false, createdAt: '2026-01-01T00:00:00.000Z' };
 try {
   await launch();
+  await nav("雙人合盤");
+  await expect(page.getByRole("heading", { name: "先建立兩位人物" })).toBeVisible();
   await page.evaluate(p => localStorage.setItem('zhonghua-mingli:v1', JSON.stringify({ version: 1, profile: p, settings: {}, history: [] })), profile);
   await page.reload();
   await expect(page.getByLabel('切換人物')).toHaveValue('legacy-a');
@@ -44,6 +46,29 @@ try {
   await expect(page.getByRole('button', { name: '查看', exact: true })).toHaveCount(1);
   await expect(page.getByText('人物：測試甲', { exact: true })).toBeVisible();
   report.checks.push('add, switch charts and filter history by person');
+  await nav('雙人合盤');
+  const beforePair = await page.evaluate(() => localStorage.getItem('zhonghua-mingli:v1'));
+  const requests = []; const onRequest = req => { if (/^https?:/.test(req.url())) requests.push(req.url()); };
+  page.on('request', onRequest);
+  await expect(page.getByTestId('relationship-result')).toBeVisible();
+  await expect(page.getByRole('table', { name: '四柱交叉關係明細' }).locator('tbody tr')).toHaveCount(16);
+  await page.getByRole('button', { name: '交換甲乙方' }).click();
+  await expect(page.getByLabel('合盤甲方')).toHaveValue(bId);
+  await expect(page.getByLabel('合盤乙方')).toHaveValue('legacy-a');
+  await page.getByLabel('關係情境').selectOption('合作');
+  await expect(page.getByRole('heading', { name: '合作相處討論' })).toBeVisible();
+  await page.getByLabel('合盤乙方').selectOption(bId);
+  await expect(page.getByRole('alert').filter({ hasText: '兩位不同' })).toBeVisible();
+  await expect(page.getByTestId('relationship-result')).toHaveCount(0);
+  await page.getByLabel('合盤乙方').selectOption('legacy-a');
+  await expect(page.getByTestId('relationship-result')).toBeVisible();
+  await page.screenshot({ path: 'outputs/relationship-preview.png', fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.setViewportSize({ width: 1280, height: 828 });
+  expect(await page.evaluate(() => localStorage.getItem('zhonghua-mingli:v1'))).toBe(beforePair);
+  expect(requests).toEqual([]); page.off('request', onRequest);
+  report.checks.push('offline relationship comparison: 16 rows, swap, context, same-person rejection, responsive and no data mutation');
   await page.getByRole('link', { name: '出生資料', exact: false }).click();
   await page.locator('input[name=name]').fill('測試甲改名');
   await page.getByRole('button', { name: '儲存並建立命盤 →', exact: true }).click();

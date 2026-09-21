@@ -1494,3 +1494,8 @@ textarea {
 .profile-switcher select { width: clamp(120px, 20vw, 260px); min-height: 36px; margin: 0; padding: 6px; font-size: .8rem; }
 .profile-switcher [role="alert"] { color: #e5a893; font-size: .75rem; }
 @media (max-width: 680px) { .topbar { flex-wrap: wrap; gap: 10px; } .top-actions { flex-wrap: wrap; } .profile-switcher label > span { display: none; } }
+
+.table-scroll { max-width: 100%; overflow-x: auto; }
+.comparison-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.comparison-table th, .comparison-table td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.comparison-table th { color: var(--gold); font-weight: 500; }

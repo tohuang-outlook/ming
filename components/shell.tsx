@@ -13,6 +13,7 @@ import {
   Settings,
   ShieldCheck,
   ScanFace,
+  Users,
 } from "lucide-react";
 import { DISCLAIMER } from "@/types";
 const links = [
@@ -25,6 +26,7 @@ const links = [
   ["/dashboard", "我的命盤", UserRound],
   ["/history", "歷史紀錄", History],
   ["/settings", "設定", Settings],
+  ["/relationship", "雙人合盤", Users],
 ] as const;
 export function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();

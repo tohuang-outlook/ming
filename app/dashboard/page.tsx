@@ -86,6 +86,7 @@ export default function Dashboard() {
               </span>
             </Link>
           </div>
+          <Link className="button" href="/relationship">雙人關係合盤 →</Link>
           <Link className="button" href="/history">
             查看全部歷史紀錄（{store.history.length}）→
           </Link>

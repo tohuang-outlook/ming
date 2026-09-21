@@ -4,7 +4,7 @@ macOS Apple Silicon（M1 或更新），macOS 13 或更新。以 Electron 44 打
 
 ## 建置
 
-在 macOS arm64 執行 `npm ci`、`npm run package:desktop`。產物在 `outputs/desktop-build/`，應用程式版本 1.5.0。靜態畫面在獨立的 `work/desktop-source` 匯出，API routes 與網站 proxy 不會帶入桌面版。主程序與 preload 使用 esbuild 打包，發行檔案採明確白名單。建置會掃描本機已知秘密並拒絕包含它們的安裝內容。
+在 macOS arm64 執行 `npm ci`、`npm run package:desktop`。產物在 `outputs/desktop-build/`，應用程式版本 1.6.0。靜態畫面在獨立的 `work/desktop-source` 匯出，API routes 與網站 proxy 不會帶入桌面版。主程序與 preload 使用 esbuild 打包，發行檔案採明確白名單。建置會掃描本機已知秘密並拒絕包含它們的安裝內容。
 
 ## 安全邊界
 
@@ -73,3 +73,9 @@ npm run package:desktop:release
 備份格式升至 version 2（profiles、activeProfileId），localStorage key 維持不變。讀取舊 v1 時純轉換、不先覆寫來源，下一次成功寫入才保存 v2。舊 v1 備份仍可匯入，v2 備份包含全部人物與當前選擇。舊版 App 不支援 v2；升級前請保存一份舊版備份，需降版時以該備份還原。備份仍限制 8 MB，API 金鑰獨立加密保存。
 
 `node scripts/test-profiles-desktop.mjs` 驗證舊資料遷移、兩人切換、編輯隔離、刪除確認、歷史保留、重啟持久性及完整備份還原。
+
+## 1.6.0 雙人關係合盤
+
+從人物資料庫選兩人，顯示八字日主五行方向、相互十神、日支、五行表層數量與四柱 16 組交叉固定配對。支援交換甲乙方及伴侶／朋友／家人／合作題目；同 ID 拒絕，少於兩人提示新增。全程離線、不送出照片或個資、不使用 API。不自動儲存合盤結果，也不改寫個人歷史。
+
+參考《三命通會》卷二的天干五合、地支六合與六沖固定配對，沿用既有八字曆法。未做旺衰、喜用神、合化、三合、刑害破或紫微合盤。不提供關係分數、前世因果或成敗推斷。
