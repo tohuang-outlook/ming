@@ -53,6 +53,16 @@ describe("Phase A calendar", () => {
         profile("2024-12-31", "23:30", { timezone: "America/Los_Angeles" }),
       ).meta.calculationTime,
     ).toBe("2025-01-01 15:30:00"));
+  it("supports explicit Pacific daylight and standard offsets", () => {
+    expect(
+      resolveBirth(profile("2008-10-08", "08:04", { timezone: "-07:00" })).meta
+        .calculationTime,
+    ).toBe("2008-10-08 23:04:00");
+    expect(
+      resolveBirth(profile("2008-12-08", "08:04", { timezone: "-08:00" })).meta
+        .calculationTime,
+    ).toBe("2008-12-09 00:04:00");
+  });
   it.each(["2024-03-10T02:30", "2024-11-03T01:30"])(
     "rejects DST ambiguity %s",
     (v) =>

@@ -45,13 +45,13 @@ export default function FacePage() {
   }
   return <>
     <PageTitle eyebrow="FACE & TRADITION" title="面相文化觀察" description="從一張照片，認識可見的五官與傳統術語。" />
-    <div className="notice face-privacy"><ShieldCheck size={22} /><span>照片僅在這部 Mac 分析，不上傳 DeepSeek。未按儲存就不會加入紀錄；離開本頁或結束 App 後，不再保留本頁照片。</span></div>
+    <div className="notice face-privacy"><ShieldCheck size={22} /><span>照片僅在此裝置 分析，不上傳 DeepSeek。未按儲存就不會加入紀錄；離開本頁或結束 App 後，不再保留本頁照片。</span></div>
     <section className="panel face-intake">
       <div><ScanFace size={32} /><h2>選擇一張正面照片</h2><p className="muted">一人入鏡、正面平視、光線均勻，讓眉眼、鼻與下巴保持清楚。避免口罩、遮擋與過度修圖。</p><p className="small muted">JPG／PNG · 最多 15 MB、3200 萬像素 · 不辨識身分、不評分美醜。</p></div>
       <div>
         <label htmlFor="face-photo" className="small">選擇你有權使用的照片</label>
         <input ref={input} id="face-photo" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" disabled={!desktop || busy || saving} onChange={event => { const file = event.target.files?.[0]; event.target.value = ""; void analyze(file); }} />
-        {!desktop && <p className="notice">請在 Mac 桌面 App 使用本機照片分析。此頁不會將照片送往網站伺服器。</p>}
+        {!desktop && <p className="notice">請在 Mac 或 iPhone App 使用本機照片分析。此頁不會將照片送往網站伺服器。</p>}
         {busy && <p role="status" className="notice">正在本機辨識五官，通常只需幾秒…</p>}
       </div>
     </section>

@@ -177,6 +177,8 @@ function ProfileEditor({ p }: { p: BirthProfile | null }) {
                 "Asia/Singapore",
                 "Asia/Tokyo",
                 "America/Los_Angeles",
+                "-07:00",
+                "-08:00",
                 "America/New_York",
                 "Europe/London",
                 "UTC",
@@ -184,9 +186,24 @@ function ProfileEditor({ p }: { p: BirthProfile | null }) {
                 <option key={t} value={t} />
               ))}
             </datalist>
+            <div className="small muted timezone-presets" aria-label="常用時區選項">
+              <span>快速選擇：</span>
+              <button type="button" className="text-button" onClick={(e) => {
+                const input = e.currentTarget.form?.elements.namedItem("timezone") as HTMLInputElement | null;
+                if (input) { input.value = "America/Los_Angeles"; input.focus(); }
+              }}>美國太平洋時間（PDT／PST，依日期判定）</button>
+              <button type="button" className="text-button" onClick={(e) => {
+                const input = e.currentTarget.form?.elements.namedItem("timezone") as HTMLInputElement | null;
+                if (input) { input.value = "-07:00"; input.focus(); }
+              }}>固定 PDT（UTC−07:00）</button>
+              <button type="button" className="text-button" onClick={(e) => {
+                const input = e.currentTarget.form?.elements.namedItem("timezone") as HTMLInputElement | null;
+                if (input) { input.value = "-08:00"; input.focus(); }
+              }}>固定 PST（UTC−08:00）</button>
+            </div>
           </label>
           <p className="small muted">
-            時區請手動確認；城市搜尋與自動時區查詢尚未提供。
+            美國太平洋時間會依出生日期自動判定 PDT 或 PST；只有出生證明明確寫出固定偏移時，才選固定 PDT／PST。
           </p>
           <button className="button primary wide" disabled={busy}>
             {busy ? "驗證出生資料…" : "儲存並建立命盤 →"}

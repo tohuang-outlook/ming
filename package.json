@@ -20,7 +20,8 @@
     "test:desktop": "node scripts/test-desktop.mjs",
     "verify:desktop": "node scripts/verify-desktop.mjs",
     "package:desktop:release": "node scripts/package-desktop-release.mjs",
-    "check:desktop:signing": "node scripts/package-desktop-release.mjs --check"
+    "check:desktop:signing": "node scripts/package-desktop-release.mjs --check",
+    "build:ios": "node scripts/build-ios.mjs"
   },
   "dependencies": {
     "@js-temporal/polyfill": "^0.5.1",
