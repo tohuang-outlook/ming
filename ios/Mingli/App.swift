@@ -21,9 +21,12 @@ final class LocalAssets: NSObject, WKURLSchemeHandler {
               let root = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "Web")?.deletingLastPathComponent() else {
             task.didFailWithError(URLError(.badURL)); return
         }
-        let route = url.path.removingPercentEncoding.flatMap { $0 == "/" || $0.isEmpty ? "/index.html" : $0 } ?? "/index.html"
-        let base = root.appendingPathComponent(route).standardizedFileURL
-        guard base.path.hasPrefix(root.path + "/") else { task.didFailWithError(URLError(.noPermissionsToReadFile)); return }
+        let decoded = url.path.removingPercentEncoding ?? "/"
+        let relative = decoded.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        guard !relative.split(separator: "/").contains(".."), !relative.contains("\\") else {
+            task.didFailWithError(URLError(.noPermissionsToReadFile)); return
+        }
+        let base = root.appendingPathComponent(relative.isEmpty ? "index.html" : relative).standardizedFileURL
         let candidates = [base, base.appendingPathExtension("html"), base.appendingPathComponent("index.html")]
         guard let file = candidates.first(where: { FileManager.default.fileExists(atPath: $0.path) && !$0.hasDirectoryPath }),
               let data = try? Data(contentsOf: file) else { task.didFailWithError(URLError(.fileDoesNotExist)); return }
