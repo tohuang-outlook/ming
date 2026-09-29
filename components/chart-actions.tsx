@@ -96,7 +96,7 @@ export function ChartActions({
   return (
     <section className="panel interpretation">
       <span className="eyebrow">從命盤，到理解</span>
-      <h2>AI 詳細解讀</h2>
+      <h2>命理解說與生活參考</h2>
       <p className="small muted">
         只傳送解讀所需的命盤結構與你的問題至
         DeepSeek，不傳送稱呼、出生地或原始出生日期。請勿在問題中填入敏感個資。AI
