@@ -11,6 +11,8 @@
 5. Xcode 上方執行裝置選自己的 iPhone，按 Run ▶。第一次可能需在 iPhone「設定 → 一般 → VPN 與裝置管理」信任開發者。
 6. App 的「設定」輸入 DeepSeek 金鑰，預設記住於 iPhone Keychain，也可以移除。請勿把金鑰加入專案。
 
+如果第一次開啟只有載入畫面，請在 Xcode 的 target → Build Phases → Copy Bundle Resources 確認 `Web` 資料夾存在，刪除 App 後再按一次 Run。新版會在資源遺失時顯示具體錯誤，不會保持全白畫面。
+
 一般 Apple 帳號的免費開發簽署通常有效 7 天；到期需重新透過 Xcode 執行安裝。保持相同 bundle identifier 和 Team 並覆蓋安裝，避免刪除 App 造成資料遺失。較長期散發需要 Apple Developer 方案；本專案尚未簽署或送審。
 
 ## 資料與隱私

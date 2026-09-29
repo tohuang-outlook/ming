@@ -18,10 +18,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 final class LocalAssets: NSObject, WKURLSchemeHandler {
     func webView(_ webView: WKWebView, start task: WKURLSchemeTask) {
         guard let url = task.request.url, url.scheme == "mingli", url.host == "app",
-              let root = Bundle.main.resourceURL?.appendingPathComponent("Web") else {
+              let root = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "Web")?.deletingLastPathComponent() else {
             task.didFailWithError(URLError(.badURL)); return
         }
-        let route = url.path == "/" || url.path.isEmpty ? "/index.html" : url.path
+        let route = url.path.removingPercentEncoding.flatMap { $0 == "/" || $0.isEmpty ? "/index.html" : $0 } ?? "/index.html"
         let base = root.appendingPathComponent(route).standardizedFileURL
         guard base.path.hasPrefix(root.path + "/") else { task.didFailWithError(URLError(.noPermissionsToReadFile)); return }
         let candidates = [base, base.appendingPathExtension("html"), base.appendingPathComponent("index.html")]
@@ -43,6 +43,7 @@ final class MingliController: UIViewController, WKScriptMessageHandlerWithReply,
     private var faceBusy = false
     private let keyQuery: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: "com.tohuang.mingli.deepseek", kSecAttrAccount as String: "api-key"]
     private var shield: UIView?
+    private var loadingLabel: UILabel!
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(red: 16/255, green: 19/255, blue: 16/255, alpha: 1)
@@ -63,6 +64,15 @@ final class MingliController: UIViewController, WKScriptMessageHandlerWithReply,
         view.addSubview(web)
         web.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([web.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor), web.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor), web.leadingAnchor.constraint(equalTo: view.leadingAnchor), web.trailingAnchor.constraint(equalTo: view.trailingAnchor)])
+        loadingLabel = UILabel(frame: .zero)
+        loadingLabel.text = "正在載入中華命理 AI…"
+        loadingLabel.textColor = .white
+        loadingLabel.textAlignment = .center
+        loadingLabel.numberOfLines = 0
+        loadingLabel.isHidden = false
+        view.addSubview(loadingLabel)
+        loadingLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([loadingLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor), loadingLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor), loadingLabel.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 24), loadingLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -24)])
         web.load(URLRequest(url: URL(string: "mingli://app/")!))
         NotificationCenter.default.addObserver(self, selector: #selector(hidePrivateContent), name: UIApplication.willResignActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(showPrivateContent), name: UIApplication.didBecomeActiveNotification, object: nil)
@@ -161,6 +171,15 @@ final class MingliController: UIViewController, WKScriptMessageHandlerWithReply,
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) { completionHandler(nil) }
     func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         decisionHandler(action.request.url?.scheme == "mingli" && action.request.url?.host == "app" ? .allow : .cancel)
+    }
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        loadingLabel?.isHidden = true
+    }
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        loadingLabel?.text = "無法載入 App 內容。\n請從 Xcode 重新按 Run，並確認 Web 資源已加入 Copy Bundle Resources。\n\(error.localizedDescription)"
+    }
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        loadingLabel?.text = "無法載入 App 內容。\n請從 Xcode 重新按 Run，並確認 Web 資源已加入 Copy Bundle Resources。\n\(error.localizedDescription)"
     }
     func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
         let alert = UIAlertController(title: "確認操作", message: message, preferredStyle: .alert)
