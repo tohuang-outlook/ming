@@ -34,6 +34,9 @@ async function secureHTML(dir) {
     // The static export contains Next/React bootstrap snippets that must hydrate
     // the page. They are bundled with the app and never accepted from the network.
     const csp = `default-src 'none'; script-src 'self' mingli: mingli://app 'unsafe-inline' 'unsafe-eval' ${hashes.join(" ")}; style-src 'self' mingli: 'unsafe-inline'; img-src 'self' mingli: data: blob:; font-src 'self' mingli:; connect-src 'self' mingli: https://api.deepseek.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'`;
+    // WKWebView file URLs need relative paths; root-relative Next links would
+    // otherwise resolve against the device filesystem instead of this bundle.
+    html = html.replace(/(src|href)="\/(?!\/)/g, '$1="./');
     html = html.replace("<head>", `<head><meta http-equiv="Content-Security-Policy" content="${csp}">`);
     await writeFile(file, html);
   }

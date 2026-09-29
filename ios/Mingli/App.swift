@@ -76,7 +76,12 @@ final class MingliController: UIViewController, WKScriptMessageHandlerWithReply,
         view.addSubview(loadingLabel)
         loadingLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([loadingLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor), loadingLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor), loadingLabel.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 24), loadingLabel.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -24)])
-        web.load(URLRequest(url: URL(string: "mingli://app/")!))
+        if let index = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "Web"),
+           let root = Bundle.main.url(forResource: "Web", withExtension: nil) ?? Bundle.main.resourceURL?.appendingPathComponent("Web") {
+            web.loadFileURL(index, allowingReadAccessTo: root)
+        } else {
+            loadingLabel?.text = "找不到 App 內頁面資源。請重新從 Xcode 建置。"
+        }
         NotificationCenter.default.addObserver(self, selector: #selector(hidePrivateContent), name: UIApplication.willResignActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(showPrivateContent), name: UIApplication.didBecomeActiveNotification, object: nil)
         cleanExports()
@@ -95,7 +100,9 @@ final class MingliController: UIViewController, WKScriptMessageHandlerWithReply,
     }
     private func deleteKey() -> Bool { let status = SecItemDelete(keyQuery as CFDictionary); return status == errSecSuccess || status == errSecItemNotFound }
     func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage, replyHandler reply: @escaping (Any?, String?) -> Void) {
-        guard message.frameInfo.isMainFrame, message.frameInfo.securityOrigin.protocol == "mingli", message.frameInfo.securityOrigin.host == "app",
+        guard message.frameInfo.isMainFrame,
+              ["file", "mingli"].contains(message.frameInfo.securityOrigin.protocol),
+              (message.frameInfo.securityOrigin.protocol == "file" || message.frameInfo.securityOrigin.host == "app"),
               let body = message.body as? [String: Any], let action = body["action"] as? String else { reply(nil, "拒絕非本機請求。"); return }
         let value = body["value"]
         switch action {
@@ -173,7 +180,8 @@ final class MingliController: UIViewController, WKScriptMessageHandlerWithReply,
     }
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) { completionHandler(nil) }
     func webView(_ webView: WKWebView, decidePolicyFor action: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        decisionHandler(action.request.url?.scheme == "mingli" && action.request.url?.host == "app" ? .allow : .cancel)
+        let url = action.request.url
+        decisionHandler((url?.isFileURL == true) || (url?.scheme == "mingli" && url?.host == "app") ? .allow : .cancel)
     }
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         loadingLabel?.isHidden = true
