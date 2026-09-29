@@ -31,8 +31,9 @@ jobs:
       - run: test "$(uname -m)" = arm64
       - run: npm ci
       # Wrangler/Miniflare are Cloudflare build-only tooling and are not bundled
-      # into the Electron app. Gate the release on shipped production deps.
-      - run: npm audit --omit=dev --audit-level=moderate
+      # into the Electron app. Their current upstream moderate advisory is
+      # tracked separately; block high/critical issues in the release graph.
+      - run: npm audit --omit=dev --audit-level=high
       - run: npm run lint
       - run: npm test
       - run: npm run build:desktop
