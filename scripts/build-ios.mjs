@@ -31,7 +31,9 @@ async function secureHTML(dir) {
     if (!entry.name.endsWith(".html")) continue;
     let html = await readFile(file, "utf8");
     const hashes = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].filter(m => m[1]).map(m => `'sha256-${createHash("sha256").update(m[1]).digest("base64")}'`);
-    const csp = `default-src 'none'; script-src mingli: ${hashes.join(" ")}; style-src mingli: 'unsafe-inline'; img-src mingli: data: blob:; font-src mingli:; connect-src mingli:; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'`;
+    // The static export contains Next/React bootstrap snippets that must hydrate
+    // the page. They are bundled with the app and never accepted from the network.
+    const csp = `default-src 'none'; script-src mingli: 'unsafe-inline' ${hashes.join(" ")}; style-src mingli: 'unsafe-inline'; img-src mingli: data: blob:; font-src mingli:; connect-src mingli: https://api.deepseek.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'`;
     html = html.replace("<head>", `<head><meta http-equiv="Content-Security-Policy" content="${csp}">`);
     await writeFile(file, html);
   }
