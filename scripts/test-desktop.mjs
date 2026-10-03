@@ -27,7 +27,7 @@ try {
   await expect(page.getByRole("heading", { name: "DeepSeek AI 設定" })).toBeVisible();
   const fakeKey = "sk-" + "a".repeat(32);
   await page.getByLabel("DeepSeek API 金鑰", { exact: true }).fill(fakeKey);
-  await expect(page.getByLabel("在此 Mac 加密記住金鑰")).toBeChecked();
+  await expect(page.getByLabel("在此裝置 加密記住金鑰")).toBeChecked();
   await page.getByRole("button", { name: "啟用 DeepSeek", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("金鑰已加密儲存", { timeout: 15000 });
   expect((await readFile(path.join(dataDir, "deepseek.enc"))).includes(Buffer.from(fakeKey))).toBe(false);
